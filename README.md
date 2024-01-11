@@ -9,6 +9,10 @@ Use python>=3.8.
 python3 -m venv regp
 source ./regp/bin/activate
 
+## Alternative: using conda
+# conda create --prefix `pwd`/regp python=3.11
+# source activate ./regp
+
 ## Install troch
 pip3 install torch
 

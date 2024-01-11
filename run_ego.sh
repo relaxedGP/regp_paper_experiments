@@ -20,7 +20,18 @@ echo "export PROBLEM=$2" >> jobscript.sh
 echo "export STRATEGY=$3" >> jobscript.sh
 echo "export SMC_METHOD=restart" >> jobscript.sh
 
-echo "source ./regp/bin/activate" >> jobscript.sh
+if [ -n "$MODULE_LOAD" ]; then
+    echo "module load $MODULE_LOAD" >> jobscript.sh
+fi
+
+if [ -f "./regp/bin/activate" ]; then
+    ## without conda
+    echo "source ./regp/bin/activate" >> jobscript.sh
+else
+    ## with conda
+    echo "source activate ./regp" >> jobscript.sh
+fi
+
 echo "python3 -u ./run/bench_optim.py" >> jobscript.sh
 
 ## Submit the job
