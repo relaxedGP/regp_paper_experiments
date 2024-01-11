@@ -2,6 +2,14 @@
 
 mkdir -p $1/report
 
+## Number of runs
+NB_RUNS=$4
+echo NB_RUNS=$NB_RUNS
+
+## Task IDs
+TASK_ID_MIN=0
+TASK_ID_MAX=$((NB_RUNS - 1))
+
 echo "#!/bin/bash" > jobscript.sh
 echo "#SBATCH --job-name=regp_bench" >> jobscript.sh
 echo "#SBATCH -o $1/report/output.%a.out" >> jobscript.sh
@@ -19,10 +27,10 @@ echo "python3 -u ./run/bench_optim.py" >> jobscript.sh
 if command -v sbatch &> /dev/null
 then
     ## Run with the SLURM scheduler
-    sbatch -a 0-$4 jobscript.sh
+    sbatch -a $TASK_ID_MIN-$TASK_ID_MAX jobscript.sh
 else
     ## Run locally
-    for a in $(seq 0 1 $4)
+    for a in $(seq $TASK_ID_MIN 1 $TASK_ID_MAX)
     do
 	export SLURM_ARRAY_TASK_ID=$a
 	bash jobscript.sh
