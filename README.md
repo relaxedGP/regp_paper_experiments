@@ -1,6 +1,6 @@
 # regp_paper_experiments
 
-Use python=3.8.
+Use python>=3.8.
 
 Installation :
 ```
