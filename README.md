@@ -21,7 +21,7 @@ git clone -b regp_paper_experiments git@github.com:johncoltrane1/gpmp.git
 pip3 install -e gpmp
 
 ## Install gpmp-contrib fork
-git clone -b 19_12_2023_regp_paper_experiments git@github.com:johncoltrane1/gpmp-contrib.git
+git clone -b regp_paper_experiments git@github.com:johncoltrane1/gpmp-contrib.git
 pip3 install -e gpmp-contrib
 ```
 
