@@ -2,24 +2,26 @@
 
 Use python>=3.8.
 
-Installation :
+## Install
+
 ```
+## Create & activate virtual environnement
+python3 -m venv regp
+source ./regp/bin/activate
+
+## Install troch
 pip3 install torch
 
-git clone git@github.com:johncoltrane1/gpmp.git
-cd gpmp
-git checkout 16_10_2023_regp_paper_experiments
-pip3 install -e .
+## Install gmpm fork
+git clone -b 16_10_2023_regp_paper_experiments git@github.com:johncoltrane1/gpmp.git
+pip3 install -e gpmp
 
-cd ..
-
-git clone git@github.com:johncoltrane1/gpmp-contrib.git
-cd gpmp-contrib
-git checkout 19_12_2023_regp_paper_experiments
-pip3 install -e .
-
-cd ..
+## Install gpmp-contrib fork
+git clone -b 19_12_2023_regp_paper_experiments git@github.com:johncoltrane1/gpmp-contrib.git
+pip3 install -e gpmp-contrib
 ```
+
+## Run benchmarks
 
 The script for launching slurm is `run_ego.sh`. E.g.,
 ```

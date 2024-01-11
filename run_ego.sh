@@ -12,7 +12,8 @@ echo "export PROBLEM=$2" >> jobscript.sh
 echo "export STRATEGY=$3" >> jobscript.sh
 echo "export SMC_METHOD=restart" >> jobscript.sh
 
-echo "python3 -u run/bench_optim.py" >> jobscript.sh
+echo "source ./regp/bin/activate" >> jobscript.sh
+echo "python3 -u ./run/bench_optim.py" >> jobscript.sh
 
 #submit the job
 sbatch -a 0-$4 jobscript.sh
