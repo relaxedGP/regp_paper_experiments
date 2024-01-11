@@ -45,8 +45,16 @@ mkdir -p $OUTPUT_DIR/report
 
 echo "#!/bin/bash" > jobscript.sh
 echo "#SBATCH --job-name=regp_bench" >> jobscript.sh
-echo "#SBATCH -o $OUTPUT_DIR/report/output.%a.out" >> jobscript.sh
-echo "#SBATCH -e $OUTPUT_DIR/report/error.%a.err" >> jobscript.sh
+echo "#SBATCH --output=$OUTPUT_DIR/report/output.%a.out" >> jobscript.sh
+echo "#SBATCH --error=$OUTPUT_DIR/report/error.%a.err" >> jobscript.sh
+
+# Adapt these SLURM directives to your setting:
+# echo "#SBATCH --account=XXX" >> jobscript.sh
+# echo "#SBATCH --partition=cpu_med" >> jobscript.sh
+# echo "#SBATCH --time=03:59:00" >> jobscript.sh
+echo "#SBATCH --nodes=1" >> jobscript.sh
+echo "#SBATCH --ntasks=1" >> jobscript.sh
+echo "#SBATCH --cpus-per-task=1" >> jobscript.sh
 
 echo "export OUTPUT_DIR=$OUTPUT_DIR" >> jobscript.sh
 echo "export PROBLEM=$PROBLEM" >> jobscript.sh
@@ -65,7 +73,10 @@ else
     echo "source activate ./regp" >> jobscript.sh
 fi
 
+echo "export LANG=C" >> jobscript.sh
+echo 'echo Starting at: `date`' >> jobscript.sh
 echo "python3 -u ./run/bench_optim.py" >> jobscript.sh
+echo 'echo Finishing at: `date`' >> jobscript.sh
 
 ## Submit the job
 if command -v sbatch &> /dev/null
