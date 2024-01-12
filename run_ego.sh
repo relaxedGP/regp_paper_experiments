@@ -6,8 +6,8 @@ if [ -z "$1" ]; then
     echo Argument \$1 missing: output directory
     exit 1
 fi
-OUTPUT_DIR=$1
-echo OUTPUT_DIR=$OUTPUT_DIR
+OUTPUT_ROOT=$1
+echo OUTPUT_ROOT=$OUTPUT_ROOT
 
 ## $2 = problem name
 if [ -z "$2" ]; then
@@ -41,12 +41,14 @@ TASK_ID_MAX=$((NB_RUNS - 1))
 SMC_METHOD=restart
 echo SMC_METHOD=$SMC_METHOD
 
-mkdir -p $OUTPUT_DIR/report
+echo OUTPUT_DIR=$OUTPUT_ROOT/optim/$PROBLEM/$STRATEGY
+
+mkdir -p $OUTPUT_DIR
 
 echo "#!/bin/bash" > jobscript.sh
 echo "#SBATCH --job-name=regp_bench" >> jobscript.sh
-echo "#SBATCH --output=$OUTPUT_DIR/report/output.%a.out" >> jobscript.sh
-echo "#SBATCH --error=$OUTPUT_DIR/report/error.%a.err" >> jobscript.sh
+echo "#SBATCH --output=$OUTPUT_DIR/output.%a.out" >> jobscript.sh
+echo "#SBATCH --error=$OUTPUT_DIR/error.%a.err" >> jobscript.sh
 
 # Adapt these SLURM directives to your setting:
 # echo "#SBATCH --account=XXX" >> jobscript.sh
