@@ -126,6 +126,7 @@ for i in idx_run_list:
         )
 
     eialgo = ei.ExpectedImprovement(problem, model, options=options["ei_options"])
+    eialgo.force_param_initial_guess = True
 
     eialgo.set_initial_design(xi=xi)
 
