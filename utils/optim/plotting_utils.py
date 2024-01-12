@@ -95,10 +95,9 @@ def get_spatial_quantiles_targets(test_function):
 
     return x_array, targets
 
-def fetch_data(data_dir):
-    i = 0
+def fetch_data(data_dir, n_runs):
     L = []
-    while True:
+    for i in range(n_runs):
         sub_path = os.path.join(data_dir, str(i), 'data.npy')
         if not os.path.exists(sub_path):
             break
@@ -108,12 +107,11 @@ def fetch_data(data_dir):
         #data = np.minimum.accumulate(data)
 
         L.append(data)
-        i += 1
 
     return L
 
-def get_format_data(data_dir, targets, max_f_evals):
-    runs_data = fetch_data(data_dir)
+def get_format_data(data_dir, targets, max_f_evals, n_runs):
+    runs_data = fetch_data(data_dir, n_runs)
 
     props_reached = []
     averaged_reached_means = []
@@ -147,6 +145,7 @@ def plotter(
         palette,
         max_f_evals,
         test_function,
+        n_runs,
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
@@ -154,8 +153,8 @@ def plotter(
 
     x_array, targets = get_spatial_quantiles_targets(test_function)
 
-    averages = {k: get_format_data(palette[k][0], targets, max_f_evals)[1] for k in palette.keys()}
-    props = {k: get_format_data(palette[k][0], targets, max_f_evals)[0] for k in palette.keys()}
+    averages = {k: get_format_data(palette[k][0], targets, max_f_evals, n_runs)[1] for k in palette.keys()}
+    props = {k: get_format_data(palette[k][0], targets, max_f_evals, n_runs)[0] for k in palette.keys()}
 
     fig, ax = plt.subplots(2, 1, sharex=True, figsize=(3.0, 2.6))
     ax1, ax2 = ax
