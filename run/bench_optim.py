@@ -137,9 +137,9 @@ for i in idx_run_list:
         # Run a step of the algorithm
         try:
             eialgo.step()
-        except gp.kernel.NonInvertibleInitCovMat as e:
+        except BaseException as e:
             print("Aborting: {}".format(e))
-            #print(traceback.format_exc())
+            print(traceback.format_exc())
             break
 
     # endfor
