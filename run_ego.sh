@@ -68,12 +68,15 @@ if [ -n "$MODULE_LOAD" ]; then
     echo "module load $MODULE_LOAD" >> jobscript.sh
 fi
 
-if [ -f "./regp/bin/activate" ]; then
-    ## without conda
-    echo "source ./regp/bin/activate" >> jobscript.sh
-else
-    ## with conda
-    echo "source activate ./regp" >> jobscript.sh
+## activate virtual env located at ./regp, if there is one
+if [ -d "./regp/" ]; then
+    if [ -f "./regp/bin/activate" ]; then
+	## without conda
+	echo "source ./regp/bin/activate" >> jobscript.sh
+    else
+	## with conda
+	echo "source activate ./regp" >> jobscript.sh
+    fi
 fi
 
 echo "export LANG=C" >> jobscript.sh
