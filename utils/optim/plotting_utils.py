@@ -98,9 +98,7 @@ def get_spatial_quantiles_targets(test_function):
 def fetch_data(data_dir, n_runs):
     L = []
     for i in range(n_runs):
-        sub_path = os.path.join(data_dir, str(i), 'data.npy')
-        if not os.path.exists(sub_path):
-            break
+        sub_path = os.path.join(data_dir, 'data_{}.npy'.format(i))
 
         data = np.load(sub_path)[:, -1]
 
