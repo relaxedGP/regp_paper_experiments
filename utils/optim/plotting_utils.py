@@ -199,6 +199,7 @@ def plotter(
 
 def plot_cummin(
         palette,
+        max_f_evals,
         test_function,
         n_runs,
     ):
@@ -206,7 +207,10 @@ def plot_cummin(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
-    cummin = {k: fetch_data(palette[k][0], n_runs, True)[1] for k in palette.keys()}
+    cummin = {k: fetch_data(palette[k][0], n_runs, True) for k in palette.keys()}
+
+    for k in cummin.keys():
+        cummin[k] = np.array([np.concatenate((_l, np.array((max_f_evals - _l.shape[0]) * [np.inf]))) for _l in cummin[k]]).mean(0)
 
     plt.figure(figsize=(3.0, 2.6))
 
