@@ -95,14 +95,15 @@ def get_spatial_quantiles_targets(test_function):
 
     return x_array, targets
 
-def fetch_data(data_dir, n_runs):
+def fetch_data(data_dir, n_runs, cummin=False):
     L = []
     for i in range(n_runs):
         sub_path = os.path.join(data_dir, 'data_{}.npy'.format(i))
 
         data = np.load(sub_path)[:, -1]
 
-        #data = np.minimum.accumulate(data)
+        if cummin:
+            data = np.minimum.accumulate(data)
 
         L.append(data)
 
@@ -191,6 +192,30 @@ def plotter(
 
     ax2.invert_xaxis()
     ax2.semilogx()
+
+    plt.tight_layout()
+
+    plt.show()
+
+def plot_cummin(
+        palette,
+        test_function,
+        n_runs,
+    ):
+    """
+    palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
+    """
+
+    cummin = {k: fetch_data(palette[k][0], n_runs, True)[1] for k in palette.keys()}
+
+    plt.figure(figsize=(3.0, 2.6))
+
+    plt.title(get_test_function_format(test_function))
+
+    for k in cummin.keys():
+        plt.plot(cummin[k], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+
+    plt.legend()
 
     plt.tight_layout()
 
