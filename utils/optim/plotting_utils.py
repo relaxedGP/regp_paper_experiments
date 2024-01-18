@@ -95,15 +95,12 @@ def get_spatial_quantiles_targets(test_function):
 
     return x_array, targets
 
-def fetch_data(data_dir, n_runs, cummin=False):
+def fetch_data(data_dir, n_runs):
     L = []
     for i in range(n_runs):
         sub_path = os.path.join(data_dir, 'data_{}.npy'.format(i))
 
         data = np.load(sub_path)[:, -1]
-
-        if cummin:
-            data = np.minimum.accumulate(data)
 
         L.append(data)
 
@@ -207,10 +204,10 @@ def plot_cummin(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
-    cummin = {k: fetch_data(palette[k][0], n_runs, True) for k in palette.keys()}
+    cummin = {k: fetch_data(palette[k][0], n_runs) for k in palette.keys()}
 
     for k in cummin.keys():
-        cummin[k] = np.array([np.concatenate((_l, np.array((max_f_evals - _l.shape[0]) * [np.inf]))) for _l in cummin[k]]).mean(0)
+        cummin[k] = np.array([np.minimum.accumulate(np.concatenate((_l, np.array((max_f_evals - _l.shape[0]) * [np.inf])))) for _l in cummin[k]]).mean(0)
 
     plt.figure(figsize=(3.0, 2.6))
 
