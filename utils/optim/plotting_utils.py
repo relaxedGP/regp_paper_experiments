@@ -106,6 +106,27 @@ def fetch_data(data_dir, n_runs):
 
     return L
 
+def get_cummin_averages(data_dir, n_runs, max_f_evals):
+    runs_data = fetch_data(data_dir, n_runs)
+
+    cummins = []
+
+    for _l in runs_data:
+        inf_padding = (max_f_evals - _l.shape[0]) * [np.inf]
+        inf_padding = np.array(inf_padding)
+
+        _padded_l = np.concatenate((_l, inf_padding))
+
+        cummin = np.minimum.accumulate(_padded_l)
+
+        cummins.append(cummin)
+
+    cummins = np.array(cummins)
+
+    average_cummins = cummins.mean(0)
+
+    return average_cummins
+
 def get_format_data(data_dir, targets, max_f_evals, n_runs):
     runs_data = fetch_data(data_dir, n_runs)
 
@@ -204,10 +225,7 @@ def plot_cummin(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
-    cummin = {k: fetch_data(palette[k][0], n_runs) for k in palette.keys()}
-
-    for k in cummin.keys():
-        cummin[k] = np.array([np.minimum.accumulate(np.concatenate((_l, np.array((max_f_evals - _l.shape[0]) * [np.inf])))) for _l in cummin[k]]).mean(0)
+    cummin = {k: get_cummin_averages(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
 
     plt.figure(figsize=(3.0, 2.6))
 
