@@ -132,7 +132,7 @@ for i in idx_run_list:
 
     # Optimization loop
     for step_ind in range(options["n_iterations"]):
-        print(f"iter {step_ind}")
+        print(f"\niter {step_ind}")
 
         # Run a step of the algorithm
         try:
