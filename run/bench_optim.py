@@ -125,10 +125,13 @@ for i in idx_run_list:
             covariance_params={"p": 2},
         )
 
+    times_records = []
+
     eialgo = ei.ExpectedImprovement(problem, model, options=options["ei_options"])
     eialgo.force_param_initial_guess = True
 
     eialgo.set_initial_design(xi=xi)
+    times_records.append(eialgo.training_time)
 
     # Optimization loop
     for step_ind in range(options["n_iterations"]):
@@ -137,6 +140,7 @@ for i in idx_run_list:
         # Run a step of the algorithm
         try:
             eialgo.step()
+            times_records.append(eialgo.training_time)
         except gp.kernel.NonInvertibleInitCovMat as e:
             print("Aborting: {}".format(e))
             #print(traceback.format_exc())
@@ -150,6 +154,8 @@ for i in idx_run_list:
 
     # Prepare output directory
     i_output_path = os.path.join(options["output_dir"], "data_{}.npy".format(str(i)))
+    i_times_path = os.path.join(options["output_dir"], "times_{}.npy".format(str(i)))
 
     # Save data
     np.save(i_output_path, np.hstack((eialgo.xi, eialgo.zi)))
+    np.save(i_times_path, np.array(times_records))
