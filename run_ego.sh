@@ -1,4 +1,3 @@
-#!/bin/bash
 set -e
 
 ## $1 = output directory
