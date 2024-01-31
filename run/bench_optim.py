@@ -141,6 +141,13 @@ for i in idx_run_list:
         try:
             eialgo.step()
             times_records.append(eialgo.training_time)
+        except gp.num.GnpLinalgError as e:
+            i_error_path = os.path.join(options["output_dir"], str(i))
+            os.mkdir(i_error_path)
+            np.savetxt(os.path.join(i_error_path, "A.csv"), e.env_dict["A"].numpy(), delimiter=",")
+            np.savetxt(os.path.join(i_error_path, "xi.csv"), e.env_dict["xi"].numpy(), delimiter=",")
+            np.savetxt(os.path.join(i_error_path, "covparam.csv"), e.env_dict["covparam"].numpy(), delimiter=",")
+            raise e
         except gp.kernel.NonInvertibleInitCovMat as e:
             print("Aborting: {}".format(e))
             #print(traceback.format_exc())
