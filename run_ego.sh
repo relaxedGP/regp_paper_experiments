@@ -80,7 +80,8 @@ fi
 
 echo "export LANG=C" >> jobscript.sh
 echo 'echo Starting at: `date`' >> jobscript.sh
-echo "python3 -u ./run/bench_optim.py" >> jobscript.sh
+# FIXME: use modules?
+echo "PYTHONPATH=. python3 -u ./run/bench_optim.py" >> jobscript.sh
 echo 'echo Finishing at: `date`' >> jobscript.sh
 
 ## Submit the job
