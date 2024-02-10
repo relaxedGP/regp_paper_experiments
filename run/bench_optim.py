@@ -9,6 +9,7 @@ import sys
 import os
 import gpmpcontrib.optim.test_problems as test_problems
 import traceback
+from numpy.random import SeedSequence, default_rng
 
 assert gp.num._gpmp_backend_ == "torch", "{} is used, please install Torch.".format(gp.num._gpmp_backend_)
 
@@ -34,6 +35,14 @@ env_options = {
     "SMC_METHOD": ("step_with_possible_restart", str),
 }
 
+# Rngs Definition
+def get_rng_list(n_run, entropy=42):
+    ss = SeedSequence(entropy)
+
+    child_seeds = ss.spawn(n_run)
+    streams = [default_rng(s) for s in child_seeds]
+
+    return streams
 
 # Initialization Function
 def initialize_optimization(env_options):
@@ -60,8 +69,10 @@ def initialize_optimization(env_options):
                 crit_optim_options[key.lower()] = value_type(value)
             elif key == "SLURM_ARRAY_TASK_ID" and value is not None:
                 idx_run_list = [value_type(value)]
-            elif key == "N_RUNS" and "SLURM_ARRAY_TASK_ID" not in os.environ:
-                idx_run_list = list(range(value_type(value)))
+            elif key == "N_RUNS":
+                n_runs = value_type(value)
+                if "SLURM_ARRAY_TASK_ID" not in os.environ:
+                    idx_run_list = list(range(n_runs))
             elif key == "STRATEGY":
                 options["threshold_strategy"] = value
 
@@ -96,13 +107,17 @@ def initialize_optimization(env_options):
     if ei_options:
         options["ei_options"] = ei_options
 
+    assert n_runs - 1 >= max(idx_run_list), (n_runs, idx_run_list)
+
     problem = getattr(test_problems, options["problem"])
 
-    return problem, options, idx_run_list
+    rng_list = get_rng_list(n_runs)
+
+    return problem, options, idx_run_list, rng_list
 
 
 # --------------------------------------------------------------------------------------
-problem, options, idx_run_list = initialize_optimization(env_options)
+problem, options, idx_run_list, rng_list = initialize_optimization(env_options)
 
 # Initialize storage
 xi_records = []
@@ -110,6 +125,9 @@ history_records = []
 
 # Repetition Loop
 for i in idx_run_list:
+    rng = rng_list[i]
+    options["ei_options"]["smc_options"]["rng"] = rng
+
     ni0 = options["n0_over_d"] * problem.input_dim
     xi = gp.misc.designs.scale(
         np.array(lhsmdu.sample(problem.input_dim, ni0, randomSeed=None).T),
