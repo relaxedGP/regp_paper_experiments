@@ -62,7 +62,6 @@ echo "export OUTPUT_DIR=$OUTPUT_DIR" >> jobscript.sh
 echo "export PROBLEM=$PROBLEM" >> jobscript.sh
 echo "export STRATEGY=$STRATEGY" >> jobscript.sh
 echo "export SMC_METHOD=$SMC_METHOD" >> jobscript.sh
-echo "export N_RUNS=$NB_RUNS" >> jobscript.sh
 
 if [ -n "$MODULE_LOAD" ]; then
     echo "module load $MODULE_LOAD" >> jobscript.sh

@@ -13,6 +13,9 @@ from numpy.random import SeedSequence, default_rng
 
 assert gp.num._gpmp_backend_ == "torch", "{} is used, please install Torch.".format(gp.num._gpmp_backend_)
 
+# Hard coded, for safety.
+n_runs_max = 1000
+
 # Settings default values and types for different options
 env_options = {
     "OUTPUT_DIR": ("output", str),
@@ -45,7 +48,7 @@ def get_rng_list(n_run, entropy=42):
     return streams
 
 # Initialization Function
-def initialize_optimization(env_options):
+def initialize_optimization(env_options, n_runs_max):
     options = {}
     crit_optim_options = {}
     ei_options = {}
@@ -69,10 +72,8 @@ def initialize_optimization(env_options):
                 crit_optim_options[key.lower()] = value_type(value)
             elif key == "SLURM_ARRAY_TASK_ID" and value is not None:
                 idx_run_list = [value_type(value)]
-            elif key == "N_RUNS":
-                n_runs = value_type(value)
-                if "SLURM_ARRAY_TASK_ID" not in os.environ:
-                    idx_run_list = list(range(n_runs))
+            elif key == "N_RUNS" and "SLURM_ARRAY_TASK_ID" not in os.environ:
+                idx_run_list = list(range(value_type(value)))
             elif key == "STRATEGY":
                 options["threshold_strategy"] = value
 
@@ -107,17 +108,17 @@ def initialize_optimization(env_options):
     if ei_options:
         options["ei_options"] = ei_options
 
-    assert n_runs - 1 >= max(idx_run_list), (n_runs, idx_run_list)
+    assert n_runs_max - 1 >= max(idx_run_list), (n_runs_max, idx_run_list)
 
     problem = getattr(test_problems, options["problem"])
 
-    rng_list = get_rng_list(n_runs)
+    rng_list = get_rng_list(n_runs_max)
 
     return problem, options, idx_run_list, rng_list
 
 
 # --------------------------------------------------------------------------------------
-problem, options, idx_run_list, rng_list = initialize_optimization(env_options)
+problem, options, idx_run_list, rng_list = initialize_optimization(env_options, n_runs_max)
 
 # Initialize storage
 xi_records = []
