@@ -10,6 +10,7 @@ import os
 import gpmpcontrib.optim.test_problems as test_problems
 import traceback
 from numpy.random import SeedSequence, default_rng
+from utils.does.designs import maximinlhs
 
 assert gp.num._gpmp_backend_ == "torch", "{} is used, please install Torch.".format(gp.num._gpmp_backend_)
 
@@ -130,10 +131,7 @@ for i in idx_run_list:
     options["ei_options"]["smc_options"]["rng"] = rng
 
     ni0 = options["n0_over_d"] * problem.input_dim
-    xi = gp.misc.designs.scale(
-        np.array(lhsmdu.sample(problem.input_dim, ni0, randomSeed=None).T),
-        problem.input_box,
-    )
+    xi = maximinlhs(problem.input_dim, ni0, problem.input_box, rng)
 
     if options["threshold_strategy"] == "None":
         model = gpc.Model_ConstantMeanMaternpML(
