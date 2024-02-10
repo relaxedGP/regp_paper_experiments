@@ -49,7 +49,7 @@ def scale(sample_standard, box):
     return sample_box
 
 
-def maximinlhs(dim, n, box, max_iter=1000):
+def maximinlhs(dim, n, box, rng, max_iter=1000):
     """
     Generate a maximin Latin Hypercube Sample (LHS) within the specified box.
 
@@ -61,6 +61,8 @@ def maximinlhs(dim, n, box, max_iter=1000):
         Number of points in the sample.
     box : list of lists
         List of lists containing the lower and upper bounds of the box.
+    rng : numpy.random.Generator
+        Random number generator.
     max_iter : int, optional
         Maximum number of iterations for finding the sample with the maximum minimum distance, default is 1000.
 
@@ -69,7 +71,7 @@ def maximinlhs(dim, n, box, max_iter=1000):
     numpy.ndarray
         Maximin Latin Hypercube Sample within the specified box.
     """
-    sampler = qmc.LatinHypercube(d=dim, optimization=None)
+    sampler = qmc.LatinHypercube(d=dim, optimization=None, seed=rng)
 
     maximindist = 0
     for i in range(max_iter):
