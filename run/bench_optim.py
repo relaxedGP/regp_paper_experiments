@@ -39,7 +39,8 @@ env_options = {
 def initialize_optimization(env_options):
     options = {}
     crit_optim_options = {}
-    ei_options = {"mh_params": {}}
+    ei_options = {}
+    smc_options = {"mh_params_custom": {}}
     # Loop through the environment options
     for key, (default, value_type) in env_options.items():
         value = os.getenv(key, default)
@@ -74,9 +75,12 @@ def initialize_optimization(env_options):
             elif key in [
                 "MH_STEPS",
             ]:
-                ei_options["mh_params"][key.lower()] = value_type(value)
+                smc_options["mh_params_custom"][key.lower()] = value_type(value)
             elif key in [
                 "N_SMC",
+            ]:
+                smc_options["n"] = value_type(value)
+            elif key in [
                 "SMC_METHOD",
             ]:
                 ei_options[key.lower()] = value_type(value)
@@ -87,6 +91,8 @@ def initialize_optimization(env_options):
     # Set crit_optim_options in options
     if crit_optim_options:
         options["crit_optim_options"] = crit_optim_options
+    if smc_options:
+        ei_options["smc_options"] = smc_options
     if ei_options:
         options["ei_options"] = ei_options
 
