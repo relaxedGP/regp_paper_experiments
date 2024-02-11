@@ -118,9 +118,6 @@ def initialize_optimization(env_options):
 # --------------------------------------------------------------------------------------
 problem, options, idx_run_list = initialize_optimization(env_options)
 
-# Initialize storage
-xi_records = []
-history_records = []
 
 # Repetition Loop
 for i in idx_run_list:
@@ -174,10 +171,6 @@ for i in idx_run_list:
             break
 
     # endfor
-
-    # Store the history of observations
-    history_records.append(eialgo.zi)
-    xi_records.append(eialgo.xi)
 
     # Prepare output directory
     i_output_path = os.path.join(options["output_dir"], "data_{}.npy".format(str(i)))
