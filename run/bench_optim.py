@@ -40,16 +40,18 @@ env_options = {
 }
 
 # Rngs Definition
-def get_rng_list(n_run, entropy=42):
+def get_rng(i, n_runs_max, entropy=42):
+    assert i <= n_runs_max - 1, (n_runs_max, i)
+
     ss = SeedSequence(entropy)
 
-    child_seeds = ss.spawn(n_run)
+    child_seeds = ss.spawn(n_runs_max)
     streams = [default_rng(s) for s in child_seeds]
 
-    return streams
+    return streams[i]
 
 # Initialization Function
-def initialize_optimization(env_options, n_runs_max):
+def initialize_optimization(env_options):
     options = {}
     crit_optim_options = {}
     ei_options = {}
@@ -109,17 +111,13 @@ def initialize_optimization(env_options, n_runs_max):
     if ei_options:
         options["ei_options"] = ei_options
 
-    assert n_runs_max - 1 >= max(idx_run_list), (n_runs_max, idx_run_list)
-
     problem = getattr(test_problems, options["problem"])
 
-    rng_list = get_rng_list(n_runs_max)
-
-    return problem, options, idx_run_list, rng_list
+    return problem, options, idx_run_list
 
 
 # --------------------------------------------------------------------------------------
-problem, options, idx_run_list, rng_list = initialize_optimization(env_options, n_runs_max)
+problem, options, idx_run_list = initialize_optimization(env_options)
 
 # Initialize storage
 xi_records = []
@@ -127,7 +125,7 @@ history_records = []
 
 # Repetition Loop
 for i in idx_run_list:
-    rng = rng_list[i]
+    rng = get_rng(i, n_runs_max)
     options["ei_options"]["smc_options"]["rng"] = rng
 
     ni0 = options["n0_over_d"] * problem.input_dim
