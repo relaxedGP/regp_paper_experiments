@@ -4,7 +4,6 @@ from matplotlib import interactive
 import gpmp as gp
 import gpmpcontrib as gpc
 import gpmpcontrib.optim.expectedimprovement as ei
-import lhsmdu
 import sys
 import os
 import gpmpcontrib.optim.test_problems as test_problems
