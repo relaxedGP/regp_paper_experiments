@@ -17,11 +17,11 @@ source ./regp/bin/activate
 pip3 install torch
 
 ## Install gmpm fork
-git clone -b regp_paper_experiments git@github.com:johncoltrane1/gpmp.git
+git clone -b regp_paper_experiments git@github.com:relaxedGP/gpmp.git
 pip3 install -e gpmp
 
 ## Install gpmp-contrib fork
-git clone -b regp_paper_experiments git@github.com:johncoltrane1/gpmp-contrib.git
+git clone -b regp_paper_experiments git@github.com:relaxedGP/gpmp-contrib.git
 pip3 install -e gpmp-contrib
 ```
 
