@@ -158,6 +158,8 @@ for i in idx_run_list:
             "GP_bench_{}".format(options["problem"]),
             output_dim=problem.output_dim,
             covariance_params={"p": 2},
+            rng=rng,
+            box=problem.input_box
         )
     else:
         threshold_strategy_params = {
@@ -174,6 +176,8 @@ for i in idx_run_list:
             crit_optim_options=options["crit_optim_options"],
             output_dim=problem.output_dim,
             covariance_params={"p": 2},
+            rng=rng,
+            box=problem.input_box
         )
 
     times_records = []
