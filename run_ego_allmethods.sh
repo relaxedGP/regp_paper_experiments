@@ -5,12 +5,10 @@ set -e
 CASE=$1
 REP=$2
 RUN_EGO="bash run_ego.sh"
+RESULTS="results"
 
-METHOD=None
-$RUN_EGO results $CASE $METHOD $REP
+for METHOD in None Constant Concentration
+do
+  $RUN_EGO $RESULTS $CASE $METHOD $REP
+done
 
-METHOD=Constant
-$RUN_EGO results $CASE $METHOD $REP
-
-METHOD=Concentration
-$RUN_EGO results $CASE $METHOD $REP
