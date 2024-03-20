@@ -7,7 +7,7 @@ REP=$2
 RUN_EGO="bash run_ego.sh"
 RESULTS="results"
 
-for METHOD in None Constant Concentration
+for METHOD in None Constant Concentration Spatial
 do
   $RUN_EGO $RESULTS $CASE $METHOD $REP
 done
