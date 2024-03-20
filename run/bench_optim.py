@@ -23,7 +23,7 @@ env_options = {
     "SLURM_ARRAY_TASK_ID": (None, int),
     "N_RUNS": (1, int),
     "PROBLEM": ("goldsteinprice", str),
-    "N0_OVER_D": (3, int),
+    "N0_OVER_D": (10, int),
     "STRATEGY": ("None", str),
     "Q_STRATEGY": (0.25, float),
     "CRIT_OPT_METHOD": ("SLSQP", str),
