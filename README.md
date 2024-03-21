@@ -29,6 +29,6 @@ pip3 install -e gpmp-contrib
 
 The script for launching slurm is `run_allmethods.sh`. E.g.,
 ```
-bash run_allmethods.sh goldsteinprice 30
+bash run_allmethods.sh goldsteinprice 30 EI
 ```
-This launchs 30 repetitions of the "Concentration", "Spatial", "Constant", and "None" heuristics on the Goldstein-Price function. Results and logs are written in `results`.
+This launchs 30 repetitions of the Expected improvement algorithm with the "Concentration", "Spatial", "Constant", and "None" heuristics on the Goldstein-Price function. Results and logs are written in `results`. Other possible algorithms are "straddle" and UCB with, for instance, "UCB10" for q = 0.1. For straddle, another arg specifying the threshold must be provided.

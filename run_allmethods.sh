@@ -4,11 +4,11 @@ set -e
 
 CASE=$1
 REP=$2
+SEQUENTIAL_STRATEGY=$3
 RUN_EGO="bash run_method.sh"
 RESULTS="results"
 
 for METHOD in None Constant Concentration Spatial
 do
-  $RUN_EGO $RESULTS $CASE $METHOD $REP
+  $RUN_EGO $RESULTS $CASE $METHOD $REP $SEQUENTIAL_STRATEGY $4
 done
-
