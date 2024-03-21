@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from matplotlib import interactive
 import gpmp as gp
 import gpmpcontrib as gpc
-import gpmpcontrib.optim.expectedimprovement as ei
 import sys
 import os
 import gpmpcontrib.optim.test_problems as test_problems
@@ -18,6 +17,7 @@ n_runs_max = 1000
 
 # Settings default values and types for different options
 env_options = {
+    "ALGO": ("EI", str),
     "OUTPUT_DIR": ("output", str),
     "N_EVALUATIONS": (300, int),
     "SLURM_ARRAY_TASK_ID": (None, int),
@@ -53,7 +53,7 @@ def get_rng(i, n_runs_max, entropy=42):
 def initialize_optimization(env_options):
     options = {}
     crit_optim_options = {}
-    ei_options = {}
+    algo_options = {}
     smc_options = {"mh_params": {}}
     # Loop through the environment options
     for key, (default, value_type) in env_options.items():
@@ -97,7 +97,14 @@ def initialize_optimization(env_options):
             elif key in [
                 "SMC_METHOD",
             ]:
-                ei_options[key.lower()] = value_type(value)
+                algo_options[key.lower()] = value_type(value)
+            elif key == "ALGO":
+                options["algo"] = value
+                if options["algo"] in ["straddle"]:
+                    options["task"] = "levelset"
+                    options["t"] = float(os.getenv("T"))
+                else:
+                    options["task"] = "optim"
             else:
                 # Add to options directly
                 options[key.lower()] = value_type(value)
@@ -106,14 +113,33 @@ def initialize_optimization(env_options):
     if crit_optim_options:
         options["crit_optim_options"] = crit_optim_options
     if smc_options:
-        ei_options["smc_options"] = smc_options
-    if ei_options:
-        options["ei_options"] = ei_options
+        algo_options["smc_options"] = smc_options
+    if algo_options:
+        options["algo_options"] = algo_options
 
     problem = getattr(test_problems, options["problem"])
 
     return problem, options, idx_run_list
 
+def get_algo(problem, model, options):
+    algo_name = options["algo"]
+    if algo_name == "EI":
+        import gpmpcontrib.optim.expectedimprovement as ei
+        algo = ei.ExpectedImprovement(problem, model, options=options["algo_options"])
+    elif algo_name[:3] == "UCB":
+        q_UCB = 0.01 * float(algo_name[3:])
+        print("UCB quantile: {}".format(q_UCB))
+        import gpmpcontrib.optim.ucb as ucb
+        algo = ucb.UCB(q_UCB, problem, model, options=options["algo_options"])
+    elif algo_name ==  "straddle":
+        t = options["t"]
+        import gpmpcontrib.levelset.straddle as straddle
+        algo = straddle.Straddle(t, problem, model, options=options["algo_options"])
+    else:
+        raise ValueError(algo_name)
+
+    algo.force_param_initial_guess = True
+    return algo
 
 # --------------------------------------------------------------------------------------
 problem, options, idx_run_list = initialize_optimization(env_options)
@@ -122,7 +148,7 @@ problem, options, idx_run_list = initialize_optimization(env_options)
 # Repetition Loop
 for i in idx_run_list:
     rng = get_rng(i, n_runs_max)
-    options["ei_options"]["smc_options"]["rng"] = rng
+    options["algo_options"]["smc_options"]["rng"] = rng
 
     ni0 = options["n0_over_d"] * problem.input_dim
     xi = maximinlhs(problem.input_dim, ni0, problem.input_box, rng)
@@ -136,8 +162,16 @@ for i in idx_run_list:
             box=problem.input_box
         )
     else:
+        threshold_strategy_params = {
+            "strategy": options["threshold_strategy"] ,
+            "level": options["q_strategy_value"] ,
+            "n_init": ni0,
+            "task": options["task"]
+        }
+        if options["task"] == "levelset":
+            threshold_strategy_params["t"] = options["t"]
         model = gpc.Model_ConstantMeanMaternp_reGP(
-            {"strategy": options["threshold_strategy"] , "level": options["q_strategy_value"] , "n_init": ni0},
+            threshold_strategy_params,
             "reGP_bench_{}".format(options["problem"]),
             crit_optim_options=options["crit_optim_options"],
             output_dim=problem.output_dim,
@@ -148,11 +182,10 @@ for i in idx_run_list:
 
     times_records = []
 
-    eialgo = ei.ExpectedImprovement(problem, model, options=options["ei_options"])
-    eialgo.force_param_initial_guess = True
+    algo = get_algo(problem, model, options)
 
-    eialgo.set_initial_design(xi=xi)
-    times_records.append(eialgo.training_time)
+    algo.set_initial_design(xi=xi)
+    times_records.append(algo.training_time)
 
     n_iterations = options["n_evaluations"] - ni0
     assert n_iterations > 0
@@ -163,8 +196,8 @@ for i in idx_run_list:
 
         # Run a step of the algorithm
         try:
-            eialgo.step()
-            times_records.append(eialgo.training_time)
+            algo.step()
+            times_records.append(algo.training_time)
         except gp.num.GnpLinalgError as e:
             i_error_path = os.path.join(options["output_dir"], str(i))
             os.mkdir(i_error_path)
@@ -184,5 +217,5 @@ for i in idx_run_list:
     i_times_path = os.path.join(options["output_dir"], "times_{}.npy".format(str(i)))
 
     # Save data
-    np.save(i_output_path, np.hstack((eialgo.xi, eialgo.zi)))
+    np.save(i_output_path, np.hstack((algo.xi, algo.zi)))
     np.save(i_times_path, np.array(times_records))

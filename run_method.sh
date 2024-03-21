@@ -32,15 +32,29 @@ fi
 NB_RUNS=$4
 echo NB_RUNS=$NB_RUNS
 
+## $5 = sequential strategy
+if [ -z "$5" ]; then
+    echo Argument \$5 missing: sequential strategy
+    exit 1
+fi
+SEQUENTIAL_STRATEGY=$5
+echo SEQUENTIAL_STRATEGY=$SEQUENTIAL_STRATEGY
+
 ## Task IDs
 TASK_ID_MIN=0
 TASK_ID_MAX=$((NB_RUNS - 1))
 
 ## SMC flavour
-SMC_METHOD=restart
+if [ $SEQUENTIAL_STRATEGY = "EI" ]; then
+    SMC_METHOD=restart
+else
+    SMC_METHOD=subset
+fi
+
+
 echo SMC_METHOD=$SMC_METHOD
 
-OUTPUT_DIR=$OUTPUT_ROOT/ei/$PROBLEM/$METHOD
+OUTPUT_DIR=$OUTPUT_ROOT/$SEQUENTIAL_STRATEGY/$PROBLEM/$METHOD
 echo OUTPUT_DIR=$OUTPUT_DIR
 
 mkdir -p $OUTPUT_DIR
@@ -62,6 +76,13 @@ echo "export OUTPUT_DIR=$OUTPUT_DIR" >> jobscript.sh
 echo "export PROBLEM=$PROBLEM" >> jobscript.sh
 echo "export STRATEGY=$METHOD" >> jobscript.sh
 echo "export SMC_METHOD=$SMC_METHOD" >> jobscript.sh
+echo "export ALGO=$SEQUENTIAL_STRATEGY" >> jobscript.sh
+## $6 = additional parameter
+if [ $SEQUENTIAL_STRATEGY = "straddle" ]; then
+    T=$6
+    echo T=$T
+    echo "export T=$T" >> jobscript.sh
+fi
 
 if [ -n "$MODULE_LOAD" ]; then
     echo "module load $MODULE_LOAD" >> jobscript.sh
@@ -81,7 +102,7 @@ fi
 echo "export LANG=C" >> jobscript.sh
 echo 'echo Starting at: `date`' >> jobscript.sh
 # FIXME: use modules?
-echo "PYTHONPATH=. python3 -u ./run/bench_optim.py" >> jobscript.sh
+echo "PYTHONPATH=. python3 -u ./run/bench.py" >> jobscript.sh
 echo 'echo Finishing at: `date`' >> jobscript.sh
 
 ## Submit the job
