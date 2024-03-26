@@ -16,13 +16,13 @@ fi
 PROBLEM=$2
 echo PROBLEM=$PROBLEM
 
-## $3 = strategy
+## $3 = method
 if [ -z "$3" ]; then
     echo Argument \$3 missing: strategy
     exit 1
 fi
-STRATEGY=$3
-echo STRATEGY=$STRATEGY
+METHOD=$3
+echo METHOD=$METHOD
 
 ## $4 = number of runs
 if [ -z "$4" ]; then
@@ -40,13 +40,13 @@ TASK_ID_MAX=$((NB_RUNS - 1))
 SMC_METHOD=restart
 echo SMC_METHOD=$SMC_METHOD
 
-OUTPUT_DIR=$OUTPUT_ROOT/ei/$PROBLEM/$STRATEGY
+OUTPUT_DIR=$OUTPUT_ROOT/ei/$PROBLEM/$METHOD
 echo OUTPUT_DIR=$OUTPUT_DIR
 
 mkdir -p $OUTPUT_DIR
 
 echo "#!/bin/bash" > jobscript.sh
-echo "#SBATCH --job-name=regp_bench_$PROBLEM-$STRATEGY" >> jobscript.sh
+echo "#SBATCH --job-name=regp_bench_$PROBLEM-$METHOD" >> jobscript.sh
 echo "#SBATCH --output=$OUTPUT_DIR/output.%a.out" >> jobscript.sh
 echo "#SBATCH --error=$OUTPUT_DIR/error.%a.err" >> jobscript.sh
 
@@ -60,7 +60,7 @@ echo "#SBATCH --cpus-per-task=1" >> jobscript.sh
 
 echo "export OUTPUT_DIR=$OUTPUT_DIR" >> jobscript.sh
 echo "export PROBLEM=$PROBLEM" >> jobscript.sh
-echo "export STRATEGY=$STRATEGY" >> jobscript.sh
+echo "export STRATEGY=$METHOD" >> jobscript.sh
 echo "export SMC_METHOD=$SMC_METHOD" >> jobscript.sh
 
 if [ -n "$MODULE_LOAD" ]; then

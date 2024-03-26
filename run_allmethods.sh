@@ -4,7 +4,7 @@ set -e
 
 CASE=$1
 REP=$2
-RUN_EGO="bash run_ego.sh"
+RUN_EGO="bash run_method.sh"
 RESULTS="results"
 
 for METHOD in None Constant Concentration Spatial
