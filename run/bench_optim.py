@@ -174,7 +174,7 @@ for i in idx_run_list:
             raise e
         except gp.kernel.NonInvertibleInitCovMat as e:
             print("Aborting: {}".format(e))
-            #print(traceback.format_exc())
+            print(traceback.format_exc())
             break
 
     # endfor
