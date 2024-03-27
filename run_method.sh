@@ -51,9 +51,9 @@ echo "#SBATCH --output=$OUTPUT_DIR/output.%a.out" >> jobscript.sh
 echo "#SBATCH --error=$OUTPUT_DIR/error.%a.err" >> jobscript.sh
 
 # Adapt these SLURM directives to your setting:
-# echo "#SBATCH --account=XXX" >> jobscript.sh
-# echo "#SBATCH --partition=cpu_med" >> jobscript.sh
-# echo "#SBATCH --time=03:59:00" >> jobscript.sh
+# echo "#SBATCH --account=XXX"        >> jobscript.sh
+# echo "#SBATCH --partition=cpu_long" >> jobscript.sh
+# echo "#SBATCH --time=19:59:00"      >> jobscript.sh
 echo "#SBATCH --nodes=1" >> jobscript.sh
 echo "#SBATCH --ntasks=1" >> jobscript.sh
 echo "#SBATCH --cpus-per-task=1" >> jobscript.sh
