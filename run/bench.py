@@ -8,7 +8,7 @@ import os
 import gpmpcontrib.optim.test_problems as test_problems
 import traceback
 from numpy.random import SeedSequence, default_rng
-from utils.does.designs import maximinlhs
+from does.designs import maximinlhs
 
 assert gp.num._gpmp_backend_ == "torch", "{} is used, please install Torch.".format(gp.num._gpmp_backend_)
 

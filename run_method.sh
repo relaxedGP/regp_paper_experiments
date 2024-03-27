@@ -102,7 +102,7 @@ fi
 echo "export LANG=C" >> jobscript.sh
 echo 'echo Starting at: `date`' >> jobscript.sh
 # FIXME: use modules?
-echo "PYTHONPATH=. python3 -u ./run/bench.py" >> jobscript.sh
+echo "PYTHONPATH=utils python3 -u ./run/bench.py" >> jobscript.sh
 echo 'echo Finishing at: `date`' >> jobscript.sh
 
 ## Submit the job
