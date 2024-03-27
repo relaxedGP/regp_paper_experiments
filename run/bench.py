@@ -102,7 +102,6 @@ def initialize_optimization(env_options):
                 options["algo"] = value
                 if options["algo"] in ["straddle"]:
                     options["task"] = "levelset"
-                    options["t"] = float(os.getenv("T"))
                 else:
                     options["task"] = "optim"
             else:
@@ -116,6 +115,13 @@ def initialize_optimization(env_options):
         algo_options["smc_options"] = smc_options
     if algo_options:
         options["algo_options"] = algo_options
+
+    if options["task"] == "optim":
+        import gpmpcontrib.optim.test_problems as test_problems
+    elif options["task"] == "levelset":
+        import gpmpcontrib.levelset.test_problems as test_problems
+    else:
+        raise ValueError(options["task"])
 
     problem = getattr(test_problems, options["problem"])
 
@@ -132,7 +138,7 @@ def get_algo(problem, model, options):
         import gpmpcontrib.optim.ucb as ucb
         algo = ucb.UCB(q_UCB, problem, model, options=options["algo_options"])
     elif algo_name ==  "straddle":
-        t = options["t"]
+        t = get_levelset_threshold(problem)
         import gpmpcontrib.levelset.straddle as straddle
         algo = straddle.Straddle(t, problem, model, options=options["algo_options"])
     else:
@@ -140,6 +146,19 @@ def get_algo(problem, model, options):
 
     algo.force_param_initial_guess = True
     return algo
+
+def get_levelset_threshold(problem):
+    functions = problem.functions
+
+    assert len(functions) == 1, functions
+
+    bounds = functions[0]["bounds"]
+
+    assert len(bounds) == 1, bounds
+    assert len(bounds[0]) == 2, bounds
+    assert bounds[0][0] == -np.inf, bounds
+
+    return bounds[0][1]
 
 # --------------------------------------------------------------------------------------
 problem, options, idx_run_list = initialize_optimization(env_options)
@@ -169,7 +188,7 @@ for i in idx_run_list:
             "task": options["task"]
         }
         if options["task"] == "levelset":
-            threshold_strategy_params["t"] = options["t"]
+            threshold_strategy_params["t"] = get_levelset_threshold(problem)
         model = gpc.Model_ConstantMeanMaternp_reGP(
             threshold_strategy_params,
             "reGP_bench_{}".format(options["problem"]),
