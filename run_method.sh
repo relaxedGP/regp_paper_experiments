@@ -77,12 +77,6 @@ echo "export PROBLEM=$PROBLEM" >> jobscript.sh
 echo "export STRATEGY=$METHOD" >> jobscript.sh
 echo "export SMC_METHOD=$SMC_METHOD" >> jobscript.sh
 echo "export ALGO=$SEQUENTIAL_STRATEGY" >> jobscript.sh
-## $6 = additional parameter
-if [ $SEQUENTIAL_STRATEGY = "straddle" ]; then
-    T=$6
-    echo T=$T
-    echo "export T=$T" >> jobscript.sh
-fi
 
 if [ -n "$MODULE_LOAD" ]; then
     echo "module load $MODULE_LOAD" >> jobscript.sh

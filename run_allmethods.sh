@@ -10,5 +10,5 @@ RESULTS="results"
 
 for METHOD in None Constant Concentration Spatial
 do
-  $RUN_EGO $RESULTS $CASE $METHOD $REP $SEQUENTIAL_STRATEGY $4
+  $RUN_EGO $RESULTS $CASE $METHOD $REP $SEQUENTIAL_STRATEGY
 done
