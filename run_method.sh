@@ -60,7 +60,7 @@ echo OUTPUT_DIR=$OUTPUT_DIR
 mkdir -p $OUTPUT_DIR
 
 echo "#!/bin/bash" > jobscript.sh
-echo "#SBATCH --job-name=regp_bench_$PROBLEM-$METHOD" >> jobscript.sh
+echo "#SBATCH --job-name=regp_bench_$PROBLEM-$METHOD-$SEQUENTIAL_STRATEGY" >> jobscript.sh
 echo "#SBATCH --output=$OUTPUT_DIR/output.%a.out" >> jobscript.sh
 echo "#SBATCH --error=$OUTPUT_DIR/error.%a.err" >> jobscript.sh
 
