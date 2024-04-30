@@ -6,6 +6,7 @@ import gpmpcontrib as gpc
 import sys
 import os
 import gpmpcontrib.optim.test_problems as test_problems
+import gpmpcontrib.smc
 import traceback
 from numpy.random import SeedSequence, default_rng
 from does.designs import maximinlhs
@@ -225,6 +226,10 @@ for i in idx_run_list:
             np.savetxt(os.path.join(i_error_path, "covparam.csv"), e.env_dict["covparam"].numpy(), delimiter=",")
             raise e
         except gp.kernel.NonInvertibleInitCovMat as e:
+            print("Aborting: {}".format(e))
+            print(traceback.format_exc())
+            break
+        except gpmpcontrib.smc.StoppingError as e:
             print("Aborting: {}".format(e))
             print(traceback.format_exc())
             break
