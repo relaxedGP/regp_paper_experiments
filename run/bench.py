@@ -111,6 +111,13 @@ def initialize_optimization(env_options):
 
     # Set crit_optim_options in options
     if crit_optim_options:
+        if crit_optim_options["method"] == "SLSQP":
+            crit_optim_keys = ["method", "relaxed_init", "ftol", "eps", "maxiter"]
+        elif crit_optim_options["method"] == "L-BFGS-B":
+            crit_optim_keys = ["method", "relaxed_init", "ftol", "gtol", "eps", "maxfun", "maxiter"]
+        else:
+            raise ValueError(crit_optim_options["method"])
+        crit_optim_options = {k: crit_optim_options[k] for k in crit_optim_keys}
         options["crit_optim_options"] = crit_optim_options
     if smc_options:
         algo_options["smc_options"] = smc_options
