@@ -234,12 +234,24 @@ for i in idx_run_list:
             print(traceback.format_exc())
             break
 
+
+        # Prepare output directory
+        i_output_path = os.path.join(options["output_dir"], "data_{}.npy".format(str(i)))
+        i_times_path = os.path.join(options["output_dir"], "times_{}.npy".format(str(i)))
+
+        if os.path.exists(i_output_path):
+            os.remove(i_output_path)
+        if os.path.exists(i_times_path):
+            os.remove(i_times_path)
+
+        # Save data
+        np.save(i_output_path, np.hstack((algo.xi, algo.zi)))
+        np.save(i_times_path, np.array(times_records))
+
     # endfor
 
-    # Prepare output directory
-    i_output_path = os.path.join(options["output_dir"], "data_{}.npy".format(str(i)))
-    i_times_path = os.path.join(options["output_dir"], "times_{}.npy".format(str(i)))
-
-    # Save data
-    np.save(i_output_path, np.hstack((algo.xi, algo.zi)))
-    np.save(i_times_path, np.array(times_records))
+    # Write success file
+    success_file_path = os.path.join(options["output_dir"], "success_{}".format(str(i)))
+    if os.path.exists(success_file_path):
+        raise RuntimeError("Output file {} already exists.".format(success_file_path))
+    open(success_file_path, 'w').close()
