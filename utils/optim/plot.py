@@ -4,13 +4,13 @@ from plotting_utils import plotter
 test_function = sys.argv[1]
 data_dir = sys.argv[2]
 
-regp_methods_palette = {"Concentration": "g", "Constant": "b", "Spatial": "o", "None": "k"}
+regp_methods_palette = {"Concentration": "g", "Constant": "b", "Spatial": "k", "None": "r"}
 sequential_strategies_palette = {"EI": "solid", "UCB10": "dashed"}
 
 def get_key_value(regp_method, test_function, sequential_strategy):
     key = "{} ({})".format(regp_method, sequential_strategy)
     value = [
-        os.path.join(sequential_strategy, test_function, regp_method),
+        os.path.join(data_dir, sequential_strategy, test_function, regp_method),
         (regp_methods_palette[regp_method], sequential_strategies_palette[sequential_strategy])
     ]
 

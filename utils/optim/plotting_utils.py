@@ -5,75 +5,82 @@ import matplotlib
 import matplotlib.pyplot as plt
 import sys
 
+def get_func_param(x):
+    param = x[-1]
+    if param == "0":
+        param = x[-2:]
+    return param
+
 def get_test_function_format(x):
 
-    x_split = x.split('_')
-
-    assert len(x_split) <= 2
-
-    if x_split[0] == 'GoldsteinPrice':
-        func_name = 'Goldstein-Price'
-    elif x_split[0] == 'GoldsteinPriceLog':
-        func_name = 'Log-Goldstein-Price'
-    elif x_split[0] == 'GoldsteinPriceGeomAvg':
-        func_name = 'G-P'
-    elif x_split[0] == 'GoldsteinPriceGeomAvgLog':
-        func_name = 'G-P Log'
-    elif x_split[0] == 'DixonPrice':
+    if x == 'goldsteinprice':
+        return 'Goldstein-Price'
+    elif x == 'goldstein_price_log':
+        return 'Log-Goldstein-Price'
+    elif x == 'crossintray':
+        return 'Cross-in-Tray'
+    elif x == 'camel_back':
+        return 'Six-hump Camel'
+    elif x == 'threehumpcamelback':
+        return 'Three-hump Camel'
+    elif x == 'beale':
+        return 'Beale'
+    elif x == 'branin':
+        return 'Branin'
+    elif 'hartman' in x:
+        func_name = "Hartman"
+    elif 'shekel' in x:
+        func_name = "Shekel"
+    elif 'zakharov' in x:
+        func_name = "Zakharov"
+    elif 'michalewicz' in x:
+        func_name = "Michalewicz"
+    elif 'perm' in x:
+        func_name = "Perm"
+    elif 'dixon_price' in x:
         func_name = 'Dixon-Price'
-    elif x == 'CrossInTray':
-        func_name = 'Cross-in-Tray'
-    elif x == 'CamelBack':
-        func_name = 'Six-hump Camel'
-    elif x == 'ThreeHumpCamelBack':
-        func_name = 'Three-hump Camel'
-    elif 'Hartman' in x_split[0]:
-        func_name = 'Hartman $({})$'.format(x_split[0][7])
-    elif 'Shekel' in x_split[0]:
-        func_name = x
-    elif x_split[0] == 'Sin2':
-        func_name = x
+    elif 'rosenbrock' in x:
+        func_name = 'Rosenbrock'
+    elif 'ackley' in x:
+        func_name = 'Ackley'
     else:
-        func_name = x_split[0]
+        raise ValueError(x)
 
-    if len(x_split) > 1:
-        func_name = "{} $({})$".format(func_name, x_split[1])
-
-    return func_name
+    res = '{} $({})$'.format(func_name, get_func_param(x))
+    return res
 
 def get_min_targets_dict():
     return {
-         'GoldsteinPrice': 4.630657803991099,
-         'GoldsteinPriceLog': 1.53269893,
-         'Hartman3': -3.8579851379549845,
-         'Hartman6': -3.0718173831021325,
-         'Branin': 0.39947399092611224,
-         'Shekel5': -3.432734952853385,
-         'Shekel7': -3.029772054726411,
-         'Shekel10': -3.688000593866475,
-         'Sin2': -0.8507671748132886,
-         'CamelBack': -1.0309776951593344,
-         'Rosenbrock_4': 45.42394451416677,
-         'Rosenbrock_6': 632.8917633859533,
-         'Rosenbrock_10': 4918.500256153549,
-         'Ackley_4': 18.44103073120918,
-         'Ackley_6': 16.076844501272827,
-         'Ackley_10': 15.374008736567806,
-         'ThreeHumpCamelBack': 0.0006440883906866736,
-         'CrossInTray': -1.934414910730356,
-         'Beale': 0.09297149626811346,
-         'DixonPrice_4': 162.0984877203831,
-         'DixonPrice_6': 111.40289721671844,
-         'DixonPrice_10': 850.3008792336834,
-         'Perm_4': 199.42446005482032,
-         'Perm_6': 1580986.9769695974,
-         'Perm_10': 2.2145398423924444e+18,
-         'Michalewicz_4': -3.1048964619461716,
-         'Michalewicz_6': -3.1536227753080497,
-         'Michalewicz_10': -3.700359579501645,
-         'Zakharov_4': 30.044662757124485,
-         'Zakharov_6': 118.91356256273377,
-         'Zakharov_10': 17393.98579965569
+         'goldsteinprice': 4.630657803991099,
+         'goldstein_price_log': 1.53269893,
+         'hartman3': -3.8579851379549845,
+         'hartman6': -3.0718173831021325,
+         'branin': 0.39947399092611224,
+         'shekel5': -3.432734952853385,
+         'shekel7': -3.029772054726411,
+         'shekel10': -3.688000593866475,
+         'camel_back': -1.0309776951593344,
+         'rosenbrock4': 45.42394451416677,
+         'rosenbrock6': 632.8917633859533,
+         'rosenbrock10': 4918.500256153549,
+         'ackley4': 18.44103073120918,
+         'ackley6': 16.076844501272827,
+         'ackley10': 15.374008736567806,
+         'threehumpcamelback': 0.0006440883906866736,
+         'crossintray': -1.934414910730356,
+         'beale': 0.09297149626811346,
+         'dixon_price4': 162.0984877203831,
+         'dixon_price6': 111.40289721671844,
+         'dixon_price10': 850.3008792336834,
+         'perm4': 199.42446005482032,
+         'perm6': 1580986.9769695974,
+         'perm10': 2.2145398423924444e+18,
+         'michalewicz4': -3.1048964619461716,
+         'michalewicz6': -3.1536227753080497,
+         'michalewicz10': -3.700359579501645,
+         'zakharov4': 30.044662757124485,
+         'zakharov6': 118.91356256273377,
+         'zakharov10': 17393.98579965569
     }
 
 def get_spatial_quantiles_targets(test_function):
