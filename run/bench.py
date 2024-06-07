@@ -9,7 +9,7 @@ import gpmpcontrib.optim.test_problems as test_problems
 import gpmpcontrib.smc
 import traceback
 from numpy.random import SeedSequence, default_rng
-from does.designs import maximinlhs
+from does.designs import maximinlhs, sobol
 
 assert gp.num._gpmp_backend_ == "torch", "{} is used, please install Torch.".format(gp.num._gpmp_backend_)
 
@@ -217,6 +217,11 @@ for i in idx_run_list:
     n_iterations = options["n_evaluations"] - ni0
     assert n_iterations > 0
 
+    if options["task"] == "levelset":
+        m = 17
+        sobol_sequence = sobol(problem.input_dim, m, problem.input_box)
+        sym_diff_vol = []
+
     # Optimization loop
     for step_ind in range(n_iterations):
         print(f"\niter {step_ind}")
@@ -225,6 +230,19 @@ for i in idx_run_list:
         try:
             algo.step()
             times_records.append(algo.training_time)
+
+            if options["task"] == "levelset":
+                mu_hat = algo.predict(sobol_sequence)[0].ravel()
+                truth = problem.eval(sobol_sequence).ravel()
+
+                t = get_levelset_threshold(problem)
+
+                key_mu_hat = (mu_hat <= t)
+                key_truth = (truth <= t)
+
+                sym_diff = (key_truth & ~key_mu_hat) | (~key_truth & key_mu_hat)
+                sym_diff_vol.append(sym_diff.mean())
+
         except gp.num.GnpLinalgError as e:
             i_error_path = os.path.join(options["output_dir"], str(i))
             os.mkdir(i_error_path)
@@ -245,15 +263,19 @@ for i in idx_run_list:
         # Prepare output directory
         i_output_path = os.path.join(options["output_dir"], "data_{}.npy".format(str(i)))
         i_times_path = os.path.join(options["output_dir"], "times_{}.npy".format(str(i)))
+        sym_diff_vol_path = os.path.join(options["output_dir"], "sym_diff_vol_{}.npy".format(str(i)))
 
         if os.path.exists(i_output_path):
             os.remove(i_output_path)
         if os.path.exists(i_times_path):
             os.remove(i_times_path)
+        if os.path.exists(sym_diff_vol_path):
+            os.remove(sym_diff_vol_path)
 
         # Save data
         np.save(i_output_path, np.hstack((algo.xi, algo.zi)))
         np.save(i_times_path, np.array(times_records))
+        np.save(sym_diff_vol_path, np.array(sym_diff_vol))
 
     # endfor
 

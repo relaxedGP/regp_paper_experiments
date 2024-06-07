@@ -8,7 +8,6 @@ from scipy.stats import qmc
 from scipy.spatial.distance import cdist, pdist
 
 
-
 def mindist(sample):
     """
     Calculate the minimum distance (separation) between any pair of points in the sample.
@@ -84,3 +83,28 @@ def maximinlhs(dim, n, box, rng, max_iter=1000):
     sample_maximin = scale(sample_maximin, box)
 
     return sample_maximin
+
+def sobol(dim, m, box):
+    """
+    Generate the Sobol' sequence within the specified box.
+
+    Parameters
+    ----------
+    dim : int
+        Number of dimensions.
+    m : int
+        Number of points in the sample (in base two).
+    box : list of lists
+        List of lists containing the lower and upper bounds of the box.
+
+    Returns
+    -------
+    numpy.ndarray
+        Sobol' sequence within the specified box.
+    """
+    sample = qmc.Sobol(d=dim, scramble=False).random_base2(m=m)
+
+    sample = scale(sample, box)
+
+    return sample
+
