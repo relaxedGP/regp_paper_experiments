@@ -263,19 +263,21 @@ for i in idx_run_list:
         # Prepare output directory
         i_output_path = os.path.join(options["output_dir"], "data_{}.npy".format(str(i)))
         i_times_path = os.path.join(options["output_dir"], "times_{}.npy".format(str(i)))
-        sym_diff_vol_path = os.path.join(options["output_dir"], "sym_diff_vol_{}.npy".format(str(i)))
 
         if os.path.exists(i_output_path):
             os.remove(i_output_path)
         if os.path.exists(i_times_path):
             os.remove(i_times_path)
-        if os.path.exists(sym_diff_vol_path):
-            os.remove(sym_diff_vol_path)
 
         # Save data
         np.save(i_output_path, np.hstack((algo.xi, algo.zi)))
         np.save(i_times_path, np.array(times_records))
-        np.save(sym_diff_vol_path, np.array(sym_diff_vol))
+
+        if options["task"] == "levelset":
+            sym_diff_vol_path = os.path.join(options["output_dir"], "sym_diff_vol_{}.npy".format(str(i)))
+            if os.path.exists(sym_diff_vol_path):
+                os.remove(sym_diff_vol_path)
+            np.save(sym_diff_vol_path, np.array(sym_diff_vol))
 
     # endfor
 
