@@ -246,3 +246,54 @@ def plot_cummin(
     plt.tight_layout()
 
     plt.show()
+
+def fetch_levelset_data(data_dir, n_runs):
+    L = []
+    for i in range(n_runs):
+        sub_path = os.path.join(data_dir, 'sym_diff_vol_{}.npy'.format(i))
+
+        data = np.load(sub_path)
+
+        L.append(data)
+
+    return L
+
+def aggregate_levelset_data(data_dir, n_runs):
+    L = fetch_levelset_data(data_dir, n_runs)
+
+    res = []
+
+    max_idx = max([d.shape[0] for d in L])
+
+    for i in range(max_idx):
+        sum_value = 0
+        cpt = 0
+        for d in L:
+            if i <= d.shape[0] - 1:
+                sum_value += d[i]
+                cpt += 1
+
+        res.append(sum_value/cpt)
+
+    return res
+
+def plotter_levelset(
+        palette,
+        n_runs,
+    ):
+    """
+    palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
+    """
+
+    data = {k: aggregate_levelset_data(palette[k][0], n_runs) for k in palette.keys()}
+
+    plt.figure(figsize=(3.0, 2.6))
+
+    for k in palette.keys():
+        plt.plot(data[k], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+
+    plt.legend()
+
+    plt.tight_layout()
+
+    plt.show()
