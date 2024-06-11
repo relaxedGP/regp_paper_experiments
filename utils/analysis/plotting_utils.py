@@ -272,6 +272,8 @@ def aggregate_levelset_data(data_dir, n_runs):
             if i <= d.shape[0] - 1:
                 sum_value += d[i]
                 cpt += 1
+            else:
+                print("Sym diff vol array: {} has less than {} elements.".format(d, max_idx))
 
         res.append(sum_value/cpt)
 
