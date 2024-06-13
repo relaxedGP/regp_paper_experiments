@@ -84,8 +84,8 @@ def get_min_targets_dict():
     }
 
 def get_spatial_quantiles_targets(test_function):
-    if test_function == 'GoldsteinPriceLog':
-        x_array, targets = get_spatial_quantiles_targets('GoldsteinPrice')
+    if test_function == 'goldstein_price_log':
+        x_array, targets = get_spatial_quantiles_targets('goldsteinprice')
         return x_array, np.log(targets).tolist()
 
     path = os.path.join("spatial_quantiles", test_function)
