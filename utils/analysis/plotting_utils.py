@@ -294,6 +294,8 @@ def plotter_levelset(
     for k in palette.keys():
         plt.plot(data[k], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
+    plt.semilogy()
+
     plt.legend()
 
     plt.tight_layout()
