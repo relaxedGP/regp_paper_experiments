@@ -234,10 +234,14 @@ def plot_cummin(
 
     cummin = {k: get_cummin_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
 
-    plt.figure(figsize=(3.0, 2.6))
+    level = 0.66
 
-    plt.title(get_test_function_format(test_function))
+    fig, ax = plt.subplots(2, 1, sharex=True, figsize=(3.0, 2.6))
+    ax1, ax2 = ax
 
+    plt.suptitle(get_test_function_format(test_function))
+
+    # First plot
     interp = lambda x: np.interp(x, np.flip(targets), np.flip(x_array))
 
     for k in cummin.keys():
@@ -245,13 +249,32 @@ def plot_cummin(
         lower_q = interp(lower_q)
         med = interp(med)
         upper_q = interp(upper_q)
-        plt.fill_between(range(lower_q.shape[0]), lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
-        plt.plot(med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        ax1.fill_between(range(lower_q.shape[0]), lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        ax1.plot(med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
-    # plt.legend()
-    plt.semilogy()
+    ax1.semilogy()
 
-    plt.tight_layout()
+    # Second plot
+    for k in palette.keys():
+        L = fetch_data(palette[k][0], n_runs)
+        l_sizes = np.array([l.shape[0] for l in L])
+        props = [(l_sizes >= n).mean() for n in range(max_f_evals)]
+
+        ax2.plot(props, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+
+    ax2.axhline(level, color='k', linestyle='dashed')
+
+    ax2.set_ylim(-0.1, 1.1)
+
+    ax2.set_yticks(
+        np.array([0, 0.33, 0.66, 1.0]),
+        [
+            matplotlib.text.Text(0.0, 0, '$\\mathdefault{0.0}$'),
+            matplotlib.text.Text(0.33, 0, '$\\mathdefault{0.33}$'),
+            matplotlib.text.Text(0.66, 0, '$\\mathdefault{0.66}$'),
+            matplotlib.text.Text(1.0, 0, '$\\mathdefault{1.0}$'),
+        ]
+    )
 
     plt.show()
 
