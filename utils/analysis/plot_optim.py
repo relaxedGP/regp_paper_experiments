@@ -1,6 +1,5 @@
 import sys, os
 from plotting_utils import plot_cummin
-import matplotlib.pyplot as plt
 
 sequential_strategy = sys.argv[1]
 data_dir = sys.argv[2]
@@ -9,6 +8,16 @@ if len(sys.argv) == 5:
     test_function = sys.argv[4]
 else:
     test_function = None
+    import matplotlib
+    matplotlib.use("pgf")
+    matplotlib.rcParams.update({
+        "pgf.texsystem": "pdflatex",
+        'font.family': 'serif',
+        'text.usetex': True,
+        'pgf.rcfonts': False,
+    })
+
+import matplotlib.pyplot as plt
 
 regp_methods_palette = {"Concentration": "g", "Constant": "b", "Spatial": "k", "None": "r"}
 sequential_strategies_palette = {"EI": "solid", "UCB10": "solid"}
