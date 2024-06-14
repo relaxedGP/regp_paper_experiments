@@ -93,12 +93,12 @@ def get_spatial_quantiles_targets(test_function):
     targets = pd.read_csv(os.path.join(path, 'thresholds.csv'), header=None).values.ravel()
     x_array = pd.read_csv(os.path.join(path, 'proba.csv'), header=None).values.ravel()
 
-    minimum_target = get_min_targets_dict()[test_function]
+    # minimum_target = get_min_targets_dict()[test_function]
 
-    key = targets <= minimum_target
+    # key = targets <= minimum_target
 
-    targets = targets[key].tolist()
-    x_array = x_array[key].tolist()
+    # targets = targets[key].tolist()
+    # x_array = x_array[key].tolist()
 
     return x_array, targets
 
@@ -113,7 +113,7 @@ def fetch_data(data_dir, n_runs):
 
     return L
 
-def get_cummin_averages(data_dir, n_runs, max_f_evals):
+def get_cummin_statistics(data_dir, n_runs, max_f_evals):
     runs_data = fetch_data(data_dir, n_runs)
 
     cummins = []
@@ -130,9 +130,7 @@ def get_cummin_averages(data_dir, n_runs, max_f_evals):
 
     cummins = np.array(cummins)
 
-    average_cummins = cummins.mean(0)
-
-    return average_cummins
+    return np.quantile(cummins, 0.1, axis=0), np.quantile(cummins, 0.5, axis=0), np.quantile(cummins, 0.9, axis=0)
 
 def get_format_data(data_dir, targets, max_f_evals, n_runs):
     runs_data = fetch_data(data_dir, n_runs)
@@ -232,16 +230,26 @@ def plot_cummin(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
-    cummin = {k: get_cummin_averages(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
+    x_array, targets = get_spatial_quantiles_targets(test_function)
+
+    cummin = {k: get_cummin_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
 
     plt.figure(figsize=(3.0, 2.6))
 
     plt.title(get_test_function_format(test_function))
 
-    for k in cummin.keys():
-        plt.plot(cummin[k], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+    interp = lambda x: np.interp(x, np.flip(targets), np.flip(x_array))
 
-    plt.legend()
+    for k in cummin.keys():
+        lower_q, med, upper_q = cummin[k]
+        lower_q = interp(lower_q)
+        med = interp(med)
+        upper_q = interp(upper_q)
+        plt.fill_between(range(lower_q.shape[0]), lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        plt.plot(med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+
+    # plt.legend()
+    plt.semilogy()
 
     plt.tight_layout()
 
