@@ -276,8 +276,6 @@ def plot_cummin(
         ]
     )
 
-    plt.show()
-
 def fetch_levelset_data(data_dir, n_runs):
     L = []
     for i in range(n_runs):
