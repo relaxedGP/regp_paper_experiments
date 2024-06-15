@@ -234,9 +234,9 @@ def plot_cummin(
 
     cummin = {k: get_cummin_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
 
-    level = 0.66
+    # level = 0.66
 
-    fig, ax = plt.subplots(2, 1, sharex=True, figsize=(3.0, 2.6))
+    fig, ax = plt.subplots(1, 2, sharey=True, figsize=(3.0, 2.6))
     ax1, ax2 = ax
 
     plt.suptitle(get_test_function_format(test_function))
@@ -255,18 +255,15 @@ def plot_cummin(
     ax1.semilogy()
 
     # Second plot
+    props = {k: get_format_data(palette[k][0], targets, max_f_evals, n_runs)[0] for k in palette.keys()}
     for k in palette.keys():
-        L = fetch_data(palette[k][0], n_runs)
-        l_sizes = np.array([l.shape[0] for l in L])
-        props = [(l_sizes >= n).mean() for n in range(max_f_evals)]
+        ax2.plot(props[k], x_array, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
-        ax2.plot(props, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+    # ax2.axvline(level, color='k', linestyle='dashed')
 
-    ax2.axhline(level, color='k', linestyle='dashed')
+    ax2.set_xlim(-0.1, 1.1)
 
-    ax2.set_ylim(-0.1, 1.1)
-
-    ax2.set_yticks(
+    ax2.set_xticks(
         np.array([0, 0.33, 0.66, 1.0]),
         [
             matplotlib.text.Text(0.0, 0, '$\\mathdefault{0.0}$'),
@@ -275,6 +272,9 @@ def plot_cummin(
             matplotlib.text.Text(1.0, 0, '$\\mathdefault{1.0}$'),
         ]
     )
+
+    # ax2.invert_xaxis()
+    # ax2.semilogx()
 
 def fetch_levelset_data(data_dir, n_runs):
     L = []
