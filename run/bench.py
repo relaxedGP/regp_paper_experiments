@@ -239,11 +239,11 @@ for i in idx_run_list:
 
                 truth = problem.eval(sobol_sequence).ravel()
 
+                t = algo.t
+
                 gaussian_cdf = scipy.stats.norm.cdf(
                     (t - mu_hat)/np.sqrt(var_hat)
                 )
-
-                t = get_levelset_threshold(problem)
 
                 key_truth = (truth <= t).astype(int)
 
