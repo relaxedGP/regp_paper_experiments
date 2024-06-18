@@ -10,6 +10,7 @@ import gpmpcontrib.smc
 import traceback
 from numpy.random import SeedSequence, default_rng
 from does.designs import maximinlhs, sobol
+import scipy.stats
 
 assert gp.num._gpmp_backend_ == "torch", "{} is used, please install Torch.".format(gp.num._gpmp_backend_)
 
@@ -232,16 +233,22 @@ for i in idx_run_list:
             times_records.append(algo.training_time)
 
             if options["task"] == "levelset":
-                mu_hat = algo.predict(sobol_sequence)[0].ravel()
+                mu_hat, var_hat = algo.predict(sobol_sequence)
+                mu_hat = mu_hat.ravel()
+                var_hat = var_hat.ravel()
+
                 truth = problem.eval(sobol_sequence).ravel()
 
-                t = get_levelset_threshold(problem)
+                t = algo.t
 
-                key_mu_hat = (mu_hat <= t)
-                key_truth = (truth <= t)
+                gaussian_cdf = scipy.stats.norm.cdf(
+                    (t - mu_hat)/np.sqrt(var_hat)
+                )
 
-                sym_diff = (key_truth & ~key_mu_hat) | (~key_truth & key_mu_hat)
-                sym_diff_vol.append(sym_diff.mean())
+                key_truth = (truth <= t).astype(int)
+
+                exp_sym_diff = key_truth * (1 - gaussian_cdf) + (1 - key_truth) * gaussian_cdf
+                sym_diff_vol.append(exp_sym_diff.mean())
 
         except gp.num.GnpLinalgError as e:
             i_error_path = os.path.join(options["output_dir"], str(i))
