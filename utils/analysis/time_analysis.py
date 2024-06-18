@@ -65,6 +65,8 @@ for k in ["Concentration", "Constant", "Spatial"]:
     plt.fill_between(range(lower_q.shape[0]), lower_q, upper_q, color=regp_methods_palette[k], alpha=0.2)
     plt.plot(med, label=k, linestyle="solid", color=regp_methods_palette[k])
 
-plt.legend()
+#plt.legend()
+plt.ylim([1, 1000])
 plt.semilogy()
+plt.tight_layout()
 plt.show()
