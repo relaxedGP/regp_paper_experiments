@@ -53,4 +53,4 @@ for test_function in test_functions:
                 # print(test_function, k, i)
             data = np.load(os.path.join(input_folder, seq_strategy, test_function, k, "data_{}.npy".format(i)))
             if data.shape[0] != 300:
-                print(test_function, k, i)
+                print(test_function, k, i, data.shape[0])
