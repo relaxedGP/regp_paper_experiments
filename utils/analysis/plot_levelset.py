@@ -33,6 +33,6 @@ plotter_levelset(
     30
 )
 
-plt.show()
-
 plt.savefig(os.path.join(output_dir, "{}.pdf".format(test_function)))
+
+plt.show()
