@@ -303,18 +303,16 @@ def aggregate_levelset_data(data_dir, n_runs):
     max_idx = max([d.shape[0] for d in L])
 
     for i in range(max_idx):
-        sum_value = 0
-        cpt = 0
+        values = []
         for d in L:
             if i <= d.shape[0] - 1:
-                sum_value += d[i]
-                cpt += 1
+                values.append(d[i])
             else:
                 print("Sym diff vol array: {} has less than {} elements.".format(d, max_idx))
 
-        res.append(sum_value/cpt)
+        res.append([np.quantile(values, 0.1), np.quantile(values, 0.5), np.quantile(values, 0.9)])
 
-    return res
+    return np.array(res)
 
 def plotter_levelset(
         palette,
@@ -329,11 +327,13 @@ def plotter_levelset(
     plt.figure(figsize=(3.0, 2.6))
 
     for k in palette.keys():
-        plt.plot(data[k], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        res_k = data[k]
+        plt.fill_between(range(res_k.shape[0]), res_k[:, 0], res_k[:, 2], color=palette[k][1][0], alpha=0.2)
+        plt.plot(res_k[:, 1], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
     plt.semilogy()
 
-    plt.legend()
+    # plt.legend()
 
     plt.tight_layout()
 
