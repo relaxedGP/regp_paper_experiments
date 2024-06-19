@@ -329,6 +329,7 @@ def plotter_levelset(
         plt.fill_between(range(res_k.shape[0]), res_k[:, 0], res_k[:, 2], color=palette[k][1][0], alpha=0.2)
         plt.plot(res_k[:, 1], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
+    plt.ylim([0.001, 1])
     plt.semilogy()
 
     # plt.legend()
