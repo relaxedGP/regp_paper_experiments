@@ -238,8 +238,8 @@ for i in idx_run_list:
             if options["task"] == "optim":
                 print(
                     "Evaluation: {}, previous minimum: {}".format(
-                        algo.zi.numpy.ravel()[-1],
-                        algo.zi.numpy.ravel()[:-1].min()
+                        algo.zi.numpy().ravel()[-1],
+                        algo.zi.numpy().ravel()[:-1].min()
                     )
                 )
 
