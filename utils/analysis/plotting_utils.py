@@ -324,8 +324,6 @@ def plotter_levelset(
 
     data = {k: aggregate_levelset_data(palette[k][0], n_runs) for k in palette.keys()}
 
-    plt.figure(figsize=(3.0, 2.6))
-
     for k in palette.keys():
         res_k = data[k]
         plt.fill_between(range(res_k.shape[0]), res_k[:, 0], res_k[:, 2], color=palette[k][1][0], alpha=0.2)
@@ -336,5 +334,3 @@ def plotter_levelset(
     # plt.legend()
 
     plt.tight_layout()
-
-    plt.show()
