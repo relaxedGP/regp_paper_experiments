@@ -218,6 +218,9 @@ for i in idx_run_list:
     n_iterations = options["n_evaluations"] - ni0
     assert n_iterations > 0
 
+    meanparam_list = []
+    covparam_list = []
+
     if options["task"] == "levelset":
         m = 17
         sobol_sequence = sobol(problem.input_dim, m, problem.input_box)
@@ -231,6 +234,14 @@ for i in idx_run_list:
         try:
             algo.step()
             times_records.append(algo.training_time)
+
+            if options["task"] == "optim":
+                print(
+                    "Evaluation: {}, previous minimum: {}".format(
+                        algo.zi.numpy.ravel()[-1],
+                        algo.zi.numpy.ravel()[:-1].min()
+                    )
+                )
 
             if options["task"] == "levelset":
                 mu_hat, var_hat = algo.predict(sobol_sequence)
@@ -266,10 +277,30 @@ for i in idx_run_list:
             print(traceback.format_exc())
             break
 
+        # Log models
+        covparam_list.append(algo.models[0]["model"].covparam.numpy())
+        meanparam_list.append(algo.models[0]["model"].meanparam.numpy())
+
+        # Prepare output directory
+        logs_path = os.path.join(options["output_dir"], "logs_{}".format(str(i)))
+        if not os.path.exists(logs_path):
+            os.mkdir(logs_path)
+
+        if "R" in algo.models[0].keys():
+            np.save(
+                os.path.join(logs_path, "R_{}.npy".format(step_ind)),
+                np.array(algo.models[0]["R"])
+            )
+            np.save(
+                os.path.join(logs_path, "zi_relaxed_{}.npy".format(step_ind)),
+                algo.model.zi_relaxed.ravel().numpy()
+            )
 
         # Prepare output directory
         i_output_path = os.path.join(options["output_dir"], "data_{}.npy".format(str(i)))
         i_times_path = os.path.join(options["output_dir"], "times_{}.npy".format(str(i)))
+        i_covparam_path = os.path.join(options["output_dir"], "covparam_{}.npy".format(str(i)))
+        i_meanparam_path = os.path.join(options["output_dir"], "meanparam_{}.npy".format(str(i)))
 
         if os.path.exists(i_output_path):
             os.remove(i_output_path)
@@ -279,6 +310,10 @@ for i in idx_run_list:
         # Save data
         np.save(i_output_path, np.hstack((algo.xi, algo.zi)))
         np.save(i_times_path, np.array(times_records))
+
+        # Save parameters
+        np.save(i_meanparam_path, np.array(meanparam_list))
+        np.save(i_covparam_path, np.array(covparam_list))
 
         if options["task"] == "levelset":
             sym_diff_vol_path = os.path.join(options["output_dir"], "sym_diff_vol_{}.npy".format(str(i)))
