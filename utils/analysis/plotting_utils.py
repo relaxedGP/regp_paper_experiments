@@ -236,6 +236,8 @@ def plot_cummin(
 
     # level = 0.66
 
+    best_perf = np.inf
+
     fig, ax = plt.subplots(1, 2, sharey=True, figsize=(3.0, 2.6))
     ax1, ax2 = ax
 
@@ -246,6 +248,9 @@ def plot_cummin(
 
     for k in cummin.keys():
         lower_q, med, upper_q = cummin[k]
+
+        best_perf = min(best_perf, lower_q.min())
+
         lower_q = interp(lower_q)
         med = interp(med)
         upper_q = interp(upper_q)
@@ -254,10 +259,13 @@ def plot_cummin(
 
     ax1.semilogy()
 
+    key_filter = (targets >= best_perf)
+
     # Second plot
     props = {k: get_format_data(palette[k][0], targets, max_f_evals, n_runs)[0] for k in palette.keys()}
     for k in palette.keys():
-        ax2.plot(props[k], x_array, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        _props_array = np.array(props[k])
+        ax2.plot(_props_array[key_filter], x_array[key_filter], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
     # ax2.axvline(level, color='k', linestyle='dashed')
 
