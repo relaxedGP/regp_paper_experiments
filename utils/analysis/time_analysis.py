@@ -70,3 +70,22 @@ plt.ylim([1, 1000])
 plt.semilogy()
 plt.tight_layout()
 plt.show()
+
+#
+plt.figure(figsize=(3.0, 2.6))
+
+plt.title("{}, {}".format(test_function, seq_strategy))
+
+for k in ["Concentration", "Constant", "Spatial"]:
+    lower_q, med, upper_q = regp_methods_relative_times[k]
+
+    _, med_none, _ = regp_methods_times["None"]
+
+    plt.fill_between(med_none, lower_q, upper_q, color=regp_methods_palette[k], alpha=0.2)
+    plt.plot(med_none, med, label=k, linestyle="solid", color=regp_methods_palette[k])
+
+#plt.legend()
+plt.ylim([1, 1000])
+plt.semilogy()
+plt.tight_layout()
+plt.show()
