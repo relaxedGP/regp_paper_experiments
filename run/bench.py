@@ -29,7 +29,7 @@ env_options = {
     "STRATEGY": ("None", str),
     "Q_STRATEGY": (0.25, float),
     "CRIT_OPT_METHOD": ("SLSQP", str),
-    "RELAXED_INIT": ("flat", str),
+    "RELAXED_INIT": ("quad_prog", str),
     "FTOL": (1e-06, float),
     "GTOL": (1e-05, float),
     "EPS": (1e-08, float),
