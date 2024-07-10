@@ -281,20 +281,20 @@ for i in idx_run_list:
         covparam_list.append(algo.models[0]["model"].covparam.numpy())
         meanparam_list.append(algo.models[0]["model"].meanparam.numpy())
 
-        # Prepare output directory
-        logs_path = os.path.join(options["output_dir"], "logs_{}".format(str(i)))
-        if not os.path.exists(logs_path):
-            os.mkdir(logs_path)
-
-        if "R" in algo.models[0].keys():
-            np.save(
-                os.path.join(logs_path, "R_{}.npy".format(step_ind)),
-                np.array(algo.models[0]["R"])
-            )
-            np.save(
-                os.path.join(logs_path, "zi_relaxed_{}.npy".format(step_ind)),
-                algo.model.zi_relaxed.ravel().numpy()
-            )
+        # # Prepare output directory
+        # logs_path = os.path.join(options["output_dir"], "logs_{}".format(str(i)))
+        # if not os.path.exists(logs_path):
+        #     os.mkdir(logs_path)
+        #
+        # if "R" in algo.models[0].keys():
+        #     np.save(
+        #         os.path.join(logs_path, "R_{}.npy".format(step_ind)),
+        #         np.array(algo.models[0]["R"])
+        #     )
+        #     np.save(
+        #         os.path.join(logs_path, "zi_relaxed_{}.npy".format(step_ind)),
+        #         algo.model.zi_relaxed.ravel().numpy()
+        #     )
 
         # Prepare output directory
         i_output_path = os.path.join(options["output_dir"], "data_{}.npy".format(str(i)))
