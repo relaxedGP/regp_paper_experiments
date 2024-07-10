@@ -77,10 +77,6 @@ echo "export PROBLEM=$PROBLEM" >> jobscript.sh
 echo "export STRATEGY=$METHOD" >> jobscript.sh
 echo "export SMC_METHOD=$SMC_METHOD" >> jobscript.sh
 echo "export ALGO=$SEQUENTIAL_STRATEGY" >> jobscript.sh
-## Specific init strategy for straddle
-if [ $SEQUENTIAL_STRATEGY = "straddle" ]; then
-    echo "export RELAXED_INIT='both'" >> jobscript.sh
-fi
 
 
 if [ -n "$MODULE_LOAD" ]; then
