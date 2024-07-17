@@ -30,7 +30,7 @@ plt.title(test_function)
 
 plotter_levelset(
     palette,
-    30
+    100
 )
 
 plt.savefig(os.path.join(output_dir, "{}.pdf".format(test_function)))
