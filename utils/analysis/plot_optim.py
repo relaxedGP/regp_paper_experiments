@@ -86,6 +86,7 @@ else:
 
 for test_function in test_functions:
     plot_test_function(test_function, sequential_strategy)
+    plt.tight_layout()
     if show:
         plt.show()
     else:
