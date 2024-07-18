@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import sys
-import gpmpcontrib.optim.test_problems as test_problems
+import gpmpcontrib.optim.test_problems as optim_test_problems
 import gpmpcontrib.levelset.test_problems as levelset_test_problems
 
 
@@ -244,7 +244,7 @@ def plot_cummin(
     """
 
     # Get dimension
-    problem = getattr(test_problems, test_function)
+    problem = getattr(optim_test_problems, test_function)
     dim = problem.input_dim
 
     # Get spatial quantiles
