@@ -16,6 +16,15 @@ def get_func_param(x):
 
 def get_test_function_format(x):
 
+    if x == "g10c6mod":
+        return x
+    elif x == "g10c6modmod":
+        return x
+    elif x == "goldsteinprice-1000":
+        return 'Goldstein-Price'
+    elif x == "goldstein_price_log-6.90775":
+        return 'Log-Goldstein-Price'
+
     if x == 'goldsteinprice':
         return 'Goldstein-Price'
     elif x == 'goldstein_price_log':
@@ -333,6 +342,8 @@ def aggregate_levelset_data(data_dir, n_runs):
 
     return np.array(res)
 
+
+
 def plotter_levelset(
         palette,
         n_runs,
@@ -343,6 +354,8 @@ def plotter_levelset(
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
+
+    plt.title(get_test_function_format(test_function))
 
     # Get dimension
     problem = getattr(levelset_test_problems, test_function)

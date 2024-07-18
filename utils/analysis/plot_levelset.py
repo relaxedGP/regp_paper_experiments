@@ -26,8 +26,6 @@ for regp_method in ["Concentration", "Constant", "Spatial", "None"]:
 
 plt.figure(figsize=(3.0, 2.6))
 
-plt.title(test_function)
-
 plotter_levelset(
     palette,
     100,
