@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import sys
 import gpmpcontrib.optim.test_problems as test_problems
+import gpmpcontrib.levelset.test_problems as levelset_test_problems
 
 
 def get_func_param(x):
@@ -335,17 +336,26 @@ def aggregate_levelset_data(data_dir, n_runs):
 def plotter_levelset(
         palette,
         n_runs,
+        test_function,
+        max_f_evals,
+        n0_over_dim
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
+    # Get dimension
+    problem = getattr(levelset_test_problems, test_function)
+    dim = problem.input_dim
+
+    # Fetch data
     data = {k: aggregate_levelset_data(palette[k][0], n_runs) for k in palette.keys()}
 
+    abscissa = list(range(n0_over_dim * dim, max_f_evals))
     for k in palette.keys():
         res_k = data[k]
-        plt.fill_between(range(res_k.shape[0]), res_k[:, 0], res_k[:, 2], color=palette[k][1][0], alpha=0.2)
-        plt.plot(res_k[:, 1], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.fill_between(abscissa, res_k[:, 0], res_k[:, 2], color=palette[k][1][0], alpha=0.2)
+        plt.plot(abscissa, res_k[:, 1], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
     plt.ylim([0.001, 1])
     plt.semilogy()
