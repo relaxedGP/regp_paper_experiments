@@ -41,7 +41,8 @@ def plot_test_function(test_function, sequential_strategy):
         palette,
         300,
         test_function,
-        100
+        100,
+        10
     )
 
 test_functions = [

@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import sys
+import gpmpcontrib.optim.test_problems as test_problems
+
 
 def get_func_param(x):
     param = x[-1]
@@ -225,11 +227,17 @@ def plot_cummin(
         max_f_evals,
         test_function,
         n_runs,
+        n0_over_dim
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
+    # Get dimension
+    problem = getattr(test_problems, test_function)
+    dim = problem.input_dim
+
+    # Get spatial quantiles
     x_array, targets = get_spatial_quantiles_targets(test_function)
 
     cummin = {k: get_cummin_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
@@ -249,13 +257,23 @@ def plot_cummin(
     for k in cummin.keys():
         lower_q, med, upper_q = cummin[k]
 
+        # Filter out initial DoE
+        lower_q = lower_q[n0_over_dim * dim:]
+        med = med[n0_over_dim * dim:]
+        upper_q = upper_q[n0_over_dim * dim:]
+
+        # Fetch best perf
         best_perf = min(best_perf, lower_q.min())
 
+        # Interpolate quantiles
         lower_q = interp(lower_q)
         med = interp(med)
         upper_q = interp(upper_q)
-        ax1.fill_between(range(lower_q.shape[0]), lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
-        ax1.plot(med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+
+        # Plot
+        abscissa = list(range(n0_over_dim * dim, max_f_evals))
+        ax1.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        ax1.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
     ax1.semilogy()
 
