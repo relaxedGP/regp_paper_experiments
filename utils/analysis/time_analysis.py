@@ -1,6 +1,8 @@
 import numpy as np
 import sys, os
 import matplotlib.pyplot as plt
+import gpmpcontrib.optim.test_problems as test_problems
+import plotting_utils
 
 input_folder = sys.argv[1]
 
@@ -9,6 +11,13 @@ test_function = sys.argv[2]
 seq_strategy = sys.argv[3]
 
 n_runs = int(sys.argv[4])
+
+# Get dim
+problem = getattr(test_problems, test_function)
+d = len(problem.input_box[0])
+
+n0_over_d = 10
+max_f_evals = 300
 
 regp_methods_palette = {"Concentration": "g", "Constant": "b", "Spatial": "k", "None": "r"}
 
@@ -58,12 +67,20 @@ for k in regp_methods_palette.keys():
 #
 plt.figure()
 
-plt.title("{}, {}".format(test_function, seq_strategy))
+plt.title("{} (reGP relative running time)".format(plotting_utils.get_test_function_format(test_function)))
+
+abscissa = list(range(n0_over_d * d, max_f_evals))
 
 for k in ["Concentration", "Constant", "Spatial"]:
     lower_q, med, upper_q = regp_methods_relative_times[k]
-    plt.fill_between(range(lower_q.shape[0]), lower_q, upper_q, color=regp_methods_palette[k], alpha=0.2)
-    plt.plot(med, label=k, linestyle="solid", color=regp_methods_palette[k])
+
+    # FIXME: Double check
+    lower_q = lower_q[1:]
+    med = med[1:]
+    upper_q = upper_q[1:]
+
+    plt.fill_between(abscissa, lower_q, upper_q, color=regp_methods_palette[k], alpha=0.2)
+    plt.plot(abscissa, med, label=k, linestyle="solid", color=regp_methods_palette[k])
 
 #plt.legend()
 plt.ylim([1, 1000])
