@@ -1,5 +1,14 @@
 import sys, os
 from plotting_utils import plotter_levelset
+import matplotlib
+
+matplotlib.use("pgf")
+matplotlib.rcParams.update({
+    "pgf.texsystem": "pdflatex",
+    'font.family': 'serif',
+    'text.usetex': True,
+    'pgf.rcfonts': False,
+})
 import matplotlib.pyplot as plt
 
 test_function = sys.argv[1]
@@ -34,6 +43,6 @@ plotter_levelset(
     10
 )
 
-plt.savefig(os.path.join(output_dir, "{}.pdf".format(test_function)))
+plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function)))
 
-plt.show()
+# plt.show()
