@@ -77,7 +77,7 @@ for k in regp_methods_palette.keys():
 #
 plt.figure(figsize=(3.0, 2.6))
 
-plt.title("{} (reGP relative running time)".format(plotting_utils.get_test_function_format(test_function)))
+plt.title("{}".format(plotting_utils.get_test_function_format(test_function)))
 
 abscissa = list(range(n0_over_d * d - 1, max_f_evals))
 
