@@ -1,5 +1,13 @@
 import numpy as np
 import sys, os
+import matplotlib
+matplotlib.use("pgf")
+matplotlib.rcParams.update({
+    "pgf.texsystem": "pdflatex",
+    'font.family': 'serif',
+    'text.usetex': True,
+    'pgf.rcfonts': False,
+})
 import matplotlib.pyplot as plt
 import gpmpcontrib.optim.test_problems as test_problems
 import plotting_utils
@@ -11,6 +19,8 @@ test_function = sys.argv[2]
 seq_strategy = sys.argv[3]
 
 n_runs = int(sys.argv[4])
+
+output_path = sys.argv[5]
 
 # Get dim
 problem = getattr(test_problems, test_function)
@@ -81,7 +91,8 @@ for k in ["Concentration", "Constant", "Spatial"]:
 plt.ylim([1, 1000])
 plt.semilogy()
 plt.tight_layout()
-plt.show()
+plt.savefig(os.path.join(output_path, "{}.pgf".format(test_function)))
+# plt.show()
 
 #
 # plt.figure()
