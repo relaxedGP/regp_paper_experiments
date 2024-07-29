@@ -69,15 +69,10 @@ plt.figure(figsize=(6 * 4/6, 4 * 4/6))
 
 plt.title("{} (reGP relative running time)".format(plotting_utils.get_test_function_format(test_function)))
 
-abscissa = list(range(n0_over_d * d, max_f_evals))
+abscissa = list(range(n0_over_d * d - 1, max_f_evals))
 
 for k in ["Concentration", "Constant", "Spatial"]:
     lower_q, med, upper_q = regp_methods_relative_times[k]
-
-    # FIXME: Double check
-    lower_q = lower_q[1:]
-    med = med[1:]
-    upper_q = upper_q[1:]
 
     plt.fill_between(abscissa, lower_q, upper_q, color=regp_methods_palette[k], alpha=0.2)
     plt.plot(abscissa, med, label=k, linestyle="solid", color=regp_methods_palette[k])
