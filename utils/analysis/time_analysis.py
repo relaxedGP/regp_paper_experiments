@@ -75,7 +75,7 @@ for k in regp_methods_palette.keys():
 # plt.show()
 
 #
-plt.figure(figsize=(3.0, 2.6))
+plt.figure(figsize=(2.9, 2.5))
 
 plt.title("{}".format(plotting_utils.get_test_function_format(test_function)))
 
