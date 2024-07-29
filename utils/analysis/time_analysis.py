@@ -75,7 +75,7 @@ for k in regp_methods_palette.keys():
 # plt.show()
 
 #
-plt.figure(figsize=(6 * 4/6, 4 * 4/6))
+plt.figure(figsize=(3.0, 2.6))
 
 plt.title("{} (reGP relative running time)".format(plotting_utils.get_test_function_format(test_function)))
 
