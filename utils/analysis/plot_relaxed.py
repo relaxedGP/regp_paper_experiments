@@ -120,8 +120,8 @@ plt.ylabel("PRED")
 
 #
 plt.yticks(
-    [],
-    []
+    [0],
+    ['t12']
 )
 
 plt.xticks(
@@ -130,9 +130,9 @@ plt.xticks(
 )
 #
 
-plt.text(12, 3800, "RSET", va='center')
-plt.text(-14, 3800, "RSET", va='center')
-plt.text(-1, 3800, "GSET", va='center')
+plt.text(12, 3900, "RSET", va='center')
+plt.text(-14, 3900, "RSET", va='center')
+plt.text(-0.5, 3900, "GSET", va='center')
 
 # plt.text(19, 50, "RSET", rotation=270, va='center')
 # plt.text(19, -50, "RSET", rotation=270, va='center')
