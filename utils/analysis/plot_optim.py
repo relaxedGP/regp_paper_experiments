@@ -33,7 +33,7 @@ def get_key_value(regp_method, test_function, sequential_strategy):
 
 def plot_test_function(test_function, sequential_strategy):
     palette = {}
-    for regp_method in ["Concentration", "Constant", "Spatial", "None"]:
+    for regp_method in ["Constant", "Spatial", "None", "Concentration"]:
         key, value = get_key_value(regp_method, test_function, sequential_strategy)
         palette[key] = value
 

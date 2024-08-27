@@ -29,7 +29,7 @@ def get_key_value(regp_method, test_function, sequential_strategy):
     return key, value
 
 palette = {}
-for regp_method in ["Concentration", "Constant", "Spatial", "None"]:
+for regp_method in ["Constant", "Spatial", "None", "Concentration"]:
     key, value = get_key_value(regp_method, test_function, sequential_strategy)
     palette[key] = value
 
