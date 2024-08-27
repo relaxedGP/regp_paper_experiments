@@ -43,6 +43,6 @@ plotter_levelset(
     10
 )
 
-plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function)))
+plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function.replace(".", "_"))))
 
 # plt.show()
