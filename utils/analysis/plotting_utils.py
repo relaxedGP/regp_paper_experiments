@@ -272,6 +272,9 @@ def plot_cummin(
         med = med[n0_over_dim * dim:]
         upper_q = upper_q[n0_over_dim * dim:]
 
+        #
+        assert lower_q.min() > min(targets)
+
         # Fetch best perf
         best_perf = min(best_perf, lower_q.min())
 
