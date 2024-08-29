@@ -125,7 +125,7 @@ def fetch_data(data_dir, n_runs):
 
     return L
 
-def get_cummin_statistics(data_dir, n_runs, max_f_evals):
+def get_cummins(data_dir, n_runs, max_f_evals):
     runs_data = fetch_data(data_dir, n_runs)
 
     cummins = []
@@ -142,6 +142,10 @@ def get_cummin_statistics(data_dir, n_runs, max_f_evals):
 
     cummins = np.array(cummins)
 
+    return cummins
+
+def get_cummin_statistics(data_dir, n_runs, max_f_evals):
+    cummins = get_cummins(data_dir, n_runs, max_f_evals)
     return np.quantile(cummins, 0.1, axis=0), np.quantile(cummins, 0.5, axis=0), np.quantile(cummins, 0.9, axis=0)
 
 def get_format_data(data_dir, targets, max_f_evals, n_runs):
@@ -314,6 +318,60 @@ def plot_cummin(
 
     # ax2.invert_xaxis()
     # ax2.semilogx()
+
+def investigate_multi_modal_optim(
+        palette,
+        max_f_evals,
+        test_function,
+        n_runs,
+        n0_over_dim,
+        local_minima_list=None,
+        global_minimum=None
+    ):
+
+    # Get dimension
+    problem = getattr(optim_test_problems, test_function)
+    dim = problem.input_dim
+
+    # Get spatial quantiles
+    x_array, targets = get_spatial_quantiles_targets(test_function)
+
+    cummins_full = {k: get_cummins(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
+    cummins_stats = {k: get_cummin_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
+
+    for k in cummins_full.keys():
+        print("\n", k)
+        lower_q, med, upper_q = cummins_stats[k]
+        cummins = cummins_full[k]
+
+        if local_minima_list is None or global_minimum is None:
+            print("Best values found: {}".format(cummins[:, max_f_evals - 1].tolist()))
+            continue
+
+        # Filter out initial DoE
+        lower_q = lower_q[n0_over_dim * dim:]
+        med = med[n0_over_dim * dim:]
+        upper_q = upper_q[n0_over_dim * dim:]
+        cummins = cummins[:, n0_over_dim * dim:]
+
+        #
+        assert lower_q.min() > min(targets)
+
+        # Plot
+        abscissa = list(range(n0_over_dim * dim, max_f_evals))
+        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+
+        for i in range(n_runs):
+            plt.plot(abscissa, cummins[i, :], color=palette[k][1][0], linestyle="dashed")
+
+        global_minimum_reached_cpt = 0
+        for i in range(n_runs):
+            final_val = cummins[i, :].min()
+            if all([np.abs(final_val - _l) > np.abs(final_val - global_minimum) for _l in local_minima_list]):
+                global_minimum_reached_cpt += 1
+
+        print("Frac global minimum reached: {}".format(global_minimum_reached_cpt/n_runs))
 
 def fetch_levelset_data(data_dir, n_runs):
     L = []
