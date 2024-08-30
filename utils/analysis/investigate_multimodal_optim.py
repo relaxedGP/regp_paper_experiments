@@ -4,6 +4,10 @@ from plotting_utils import investigate_multi_modal_optim, get_test_function_form
 sequential_strategy = sys.argv[1]
 data_dir = sys.argv[2]
 test_function = sys.argv[3]
+if len(sys.argv) == 5:
+    force_no_minima = sys.argv[4] == "True"
+else:
+    force_no_minima = False
 
 import matplotlib.pyplot as plt
 
@@ -39,7 +43,7 @@ def plot_test_function(test_function, sequential_strategy, local_minima_list, gl
     )
 
 
-if test_function in local_minima_lists.keys() and test_function in global_minimums.keys():
+if (test_function in local_minima_lists.keys() and test_function in global_minimums.keys()) and not force_no_minima:
     local_minima_list = local_minima_lists[test_function]
     global_minimum = global_minimums[test_function]
 else:
