@@ -14,8 +14,16 @@ import matplotlib.pyplot as plt
 regp_methods_palette = {"Concentration": "g", "Constant": "b", "Spatial": "k", "None": "r"}
 sequential_strategies_palette = {"EI": "solid", "UCB10": "solid"}
 
-local_minima_lists = {"hartman6": [-3.20316191], "goldstein_price_log": [4.4308168, 3.40119738]}
-global_minimums = {"hartman6": -3.32236801, "goldstein_price_log": 1.09861229}
+local_minima_lists = {
+    "hartman6": [-3.20316191],
+    "goldstein_price_log": [4.4308168, 3.40119738],
+    "shekel5": [-5.055197728765767, -2.6828603956634143]
+}
+global_minimums = {
+    "hartman6": -3.32236801,
+    "goldstein_price_log": 1.09861229,
+    "shekel5": -10.15319967864548
+}
 
 def get_key_value(regp_method, test_function, sequential_strategy):
     key = "{} ({})".format(regp_method, sequential_strategy)
