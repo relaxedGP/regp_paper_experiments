@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 regp_methods_palette = {"Concentration": "g", "Constant": "b", "Spatial": "k", "None": "r"}
 sequential_strategies_palette = {"EI": "solid", "UCB10": "solid"}
 
+# These lists contain values appearing repeatedly in the results. Only the cases for which there was a small number
+# of highly recurrent values are considered.
 local_minima_lists = {
     "hartman6": [-3.20316191],
     "goldstein_price_log": [4.4308168, 3.40119738],
