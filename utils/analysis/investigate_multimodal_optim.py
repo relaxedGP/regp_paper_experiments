@@ -24,13 +24,17 @@ local_minima_lists = {
     "hartman6": [-3.20316191],
     "goldstein_price_log": [4.4308168, 3.40119738],
     "shekel5": [-5.100772140331936, -2.6828603956634143],
-    "shekel7": [-5.12882270380293]
+    "shekel7": [-5.12882270380293],
+    "shekel10": [-5.175646763018181],
+    "crossintray": [-1.8899380457855652],
 }
 global_minimums = {
     "hartman6": -3.32236801,
     "goldstein_price_log": 1.09861229,
     "shekel5": -10.15319967864548,
-    "shekel7": -10.402915336170734
+    "shekel7": -10.402915336170734,
+    "shekel10": -10.536443153483521,
+    "crossintray": -2.062611870822699,
 }
 
 def get_key_value(regp_method, test_function, sequential_strategy):
