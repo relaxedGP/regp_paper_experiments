@@ -1,5 +1,9 @@
 import sys, os
 from plotting_utils import investigate_multi_modal_optim, get_test_function_format
+import gpmpcontrib.optim.test_problems
+from scipy.optimize import minimize
+from scipy.stats import qmc
+import numpy as np
 
 sequential_strategy = sys.argv[1]
 data_dir = sys.argv[2]
@@ -54,7 +58,26 @@ def plot_test_function(test_function, sequential_strategy, local_minima_list, gl
         global_minimum
     )
 
+#
+n_run_local_opt = 100
 
+problem = getattr(gpmpcontrib.optim.test_problems, test_function)
+box = problem.input_box
+assert all([len(_v) == len(box[0]) for _v in box])
+bounds = [tuple(box[i][k] for i in range(len(box))) for k in range(len(box[0]))]
+
+funs = []
+
+for _ in range(n_run_local_opt):
+    x0_std = np.random.uniform(size=problem.input_dim).reshape(1, -1)
+    x0 = qmc.scale(x0_std, box[0], box[1]).ravel()
+    _fun = minimize(fun=lambda x: problem.eval(x.reshape(1, -1)), bounds=bounds, x0=x0).fun
+    funs.append(_fun)
+
+funs.sort()
+print("Local opt output: ", funs)
+
+#
 if (test_function in local_minima_lists.keys() and test_function in global_minimums.keys()) and not force_no_minima:
     local_minima_list = local_minima_lists[test_function]
     global_minimum = global_minimums[test_function]
