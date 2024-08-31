@@ -60,12 +60,10 @@ else:
     local_minima_list = None
     global_minimum = None
 
-if local_minima_list is not None and global_minimum is not None:
-    plt.figure()
-    plt.title(get_test_function_format(test_function))
+plt.figure()
+plt.title(get_test_function_format(test_function))
 
 plot_test_function(test_function, sequential_strategy, local_minima_list, global_minimum)
 
-if local_minima_list is not None and global_minimum is not None:
-    plt.tight_layout()
-    plt.show()
+plt.tight_layout()
+plt.show()

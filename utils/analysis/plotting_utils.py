@@ -346,7 +346,6 @@ def investigate_multi_modal_optim(
 
         if local_minima_list is None or global_minimum is None:
             print("Best values found: {}".format(cummins[:, max_f_evals - 1].tolist()))
-            continue
 
         # Filter out initial DoE
         lower_q = lower_q[n0_over_dim * dim:]
@@ -365,13 +364,14 @@ def investigate_multi_modal_optim(
         for i in range(n_runs):
             plt.plot(abscissa, cummins[i, :], color=palette[k][1][0], linestyle="dashed")
 
-        global_minimum_reached_cpt = 0
-        for i in range(n_runs):
-            final_val = cummins[i, :].min()
-            if all([np.abs(final_val - _l) > np.abs(final_val - global_minimum) for _l in local_minima_list]):
-                global_minimum_reached_cpt += 1
+        if local_minima_list is not None and global_minimum is not None:
+            global_minimum_reached_cpt = 0
+            for i in range(n_runs):
+                final_val = cummins[i, :].min()
+                if all([np.abs(final_val - _l) > np.abs(final_val - global_minimum) for _l in local_minima_list]):
+                    global_minimum_reached_cpt += 1
 
-        print("Frac global minimum reached: {}".format(global_minimum_reached_cpt/n_runs))
+            print("Frac global minimum reached: {}".format(global_minimum_reached_cpt/n_runs))
 
 def fetch_levelset_data(data_dir, n_runs):
     L = []
