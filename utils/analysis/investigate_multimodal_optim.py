@@ -27,6 +27,7 @@ local_minima_lists = {
     "shekel7": [-5.12882270380293],
     "shekel10": [-5.175646763018181],
     "crossintray": [-1.8899380457855652],
+    "michalewicz4": [-3.657094287125618]
 }
 global_minimums = {
     "hartman6": -3.32236801,
@@ -35,6 +36,7 @@ global_minimums = {
     "shekel7": -10.402915336170734,
     "shekel10": -10.536443153483521,
     "crossintray": -2.062611870822699,
+    "michalewicz4": -3.6988570984633418
 }
 
 def get_key_value(regp_method, test_function, sequential_strategy):
