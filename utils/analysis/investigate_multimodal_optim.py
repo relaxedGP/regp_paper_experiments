@@ -19,12 +19,14 @@ sequential_strategies_palette = {"EI": "solid", "UCB10": "solid"}
 local_minima_lists = {
     "hartman6": [-3.20316191],
     "goldstein_price_log": [4.4308168, 3.40119738],
-    "shekel5": [-5.055197728765767, -2.6828603956634143]
+    "shekel5": [-5.055197728765767, -2.6828603956634143],
+    "shekel7": [-5.0876717219047345]
 }
 global_minimums = {
     "hartman6": -3.32236801,
     "goldstein_price_log": 1.09861229,
-    "shekel5": -10.15319967864548
+    "shekel5": -10.15319967864548,
+    "shekel7": -10.402915336170734
 }
 
 def get_key_value(regp_method, test_function, sequential_strategy):
