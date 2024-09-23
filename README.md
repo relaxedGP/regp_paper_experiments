@@ -1,8 +1,25 @@
 # regp_paper_experiments
 
-Use python>=3.8.
+This repository contains the scripts used for the numerical bencharmks of the article:
 
-## Install
+Sébastien J. Petit (§), Julien Bect (†), and Emmanuel Vazquez (†)
+**Relaxed Gaussian Process Interpolation: a Goal-Oriented Approach to Bayesian Optimization**
+([arXiv:2206.03034](https://arxiv.org/abs/2206.03034))
+
+It relies on code available on two other repositories: https://github.com/relaxedGP/gpmp.git and https://github.com/relaxedGP/gpmp-contrib.git.
+
+(§) Laboratoire National de Métrologie et d’Essais, 78197 Trappes Cedex, France
+(†) Université Paris-Saclay, CNRS, CentraleSupélec,
+[Laboratoire des signaux et systèmes](https://l2s.centralesupelec.fr/),
+Gif-sur-Yvette, France.  
+
+![Illustration](images/regp_illustration.png)
+
+## Requirements
+
+### Installation for Python
+
+Use Python>=3.8.
 
 ```
 ## Create & activate virtual environnement
@@ -25,7 +42,7 @@ git clone -b regp_paper_experiments https://github.com/relaxedGP/gpmp-contrib.gi
 pip3 install -e gpmp-contrib
 ```
 
-## Run benchmarks
+### Reproducing the benchmarks
 
 The script for launching slurm is `run_allmethods.sh`. E.g.,
 ```
