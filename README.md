@@ -62,7 +62,7 @@ For the UCB algorithm with a 10\%-quantile, the corresponding command is
 ```
 PYTHONPATH=utils SMC_METHOD=subset problem=goldsteinprice ALGO=UCB10 STRATEGY=Concentration python3 -u run/bench.py
 ```
-and simiarly for the other keywords from the file `optim_cases.txt`. 
+and similarly for the other keywords from the file `optim_cases.txt`. 
 Other quantile levels can be used, as `UCB1`, for the UCB algorithm with a 1\% quantile.
 
 The script for launching slurm is `run_allmethods.sh`. E.g.,
