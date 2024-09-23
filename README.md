@@ -44,6 +44,27 @@ pip3 install -e gpmp-contrib
 
 ### Reproducing the benchmarks
 
+#### Expected Improvement benchmark
+
+The EGO algorithm and the three reGP variants introduced in the article can be run using the script: `run/bench.py`.
+For the *concentration* heuristic on the *Goldstein-Price* function, one runs:
+```
+PYTHONPATH=utils SMC_METHOD=restart problem=goldsteinprice ALGO=EI STRATEGY=Concentration python3 -u run/bench.py
+```
+The two other reGP variants are run by setting `STRATEGY=Constant` and `STRATEGY=Spatial`.
+The traditional EGO algorithm is run using by setting `STRATEGY=None`.
+
+The file `optim_cases.txt` details the keywords for the other test functions from the article.
+
+####  Upper Confidence Bounds (UCB) benchmark
+
+For the UCB algorithm with a 10\%-quantile, the corresponding command is
+```
+PYTHONPATH=utils SMC_METHOD=subset problem=goldsteinprice ALGO=UCB10 STRATEGY=Concentration python3 -u run/bench.py
+```
+and simiarly for the other keywords from the file `optim_cases.txt`. 
+Other quantile levels can be used, as `UCB1`, for the UCB algorithm with a 1\% quantile.
+
 The script for launching slurm is `run_allmethods.sh`. E.g.,
 ```
 bash run_allmethods.sh goldsteinprice 30 EI
