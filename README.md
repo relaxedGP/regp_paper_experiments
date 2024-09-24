@@ -11,7 +11,8 @@ Sébastien J. Petit (§), Julien Bect (†), and Emmanuel Vazquez (†)
 [Laboratoire des signaux et systèmes](https://l2s.centralesupelec.fr/),
 Gif-sur-Yvette, France.  
 
-It relies on code available [here](https://github.com/relaxedGP/gpmp.git) and [here](https://github.com/relaxedGP/gpmp-contrib.git).
+It relies on code available [here](https://github.com/relaxedGP/gpmp/tree/regp_paper_experiments)
+and [here](https://github.com/relaxedGP/gpmp-contrib/tree/regp_paper_experiments).
 
 ![Illustration](images/regp_illustration.png)
 
