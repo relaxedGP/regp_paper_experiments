@@ -44,6 +44,9 @@ pip3 install -e gpmp-contrib
 
 ### Reproducing the benchmarks
 
+The numerical experiments for the three benchmarks from the article can be run using the script: `run/bench.py`.
+The folder `results` must be created for the results to be stored.
+
 #### Expected Improvement benchmark
 
 The EGO algorithm and the three EGO-R variants introduced in the article can be run using the script: `run/bench.py`.
@@ -67,14 +70,25 @@ Other quantile levels can be used. For instance, the argument `ALGO=UCB1` stands
 
 #### Straddle benchmark
 
+The straddle benchmark can be reproduced similarly. For the `c6` test function, run:
 ```
-PYTHONPATH=utils problem=g10c6mod ALGO=straddle STRATEGY=Concentration SMC_METHOD=subset ../PycharmProjects/gpmp/Scripts/python.exe -u run/bench.py
+PYTHONPATH=utils problem=c6 ALGO=straddle STRATEGY=Concentration SMC_METHOD=subset ../PycharmProjects/gpmp/Scripts/python.exe -u run/bench.py
 ```
+Use the same command for the `c67` test function.
+The argument `problem=goldsteinprice-1000` can be used to run the straddle heuristic on the Goldstein-Price function with the threshold $`s = 1000`$.
+The corresponding argument is `problem=goldstein_price_log-6.90775` for the log version.
+The straddle heuristic can be run with other threshold values for the Goldstein-Price function and its log version.
 
-#### 
+##### Lauching using SLURM
 
-The script for launching slurm is `run_allmethods.sh`. E.g.,
+The previous commands can be used to launch a single repetition of sequential design-of-experiments strategies.
+Several repetitions can be launched in parallel using SLURM.
+For instance, one can launch 100 repetitions of EGO-R with the concentration heuristic on the Goldstein-Price function
+using:
 ```
-bash run_allmethods.sh goldsteinprice 30 EI
+bash run_method.sh results goldsteinprice Concentration 100 EI
 ```
-This launchs 30 repetitions of the Expected improvement algorithm with the "Concentration", "Spatial", "Constant", and "None" heuristics on the Goldstein-Price function. Results and logs are written in `results`. Other possible algorithms are "straddle" and UCB with, for instance, "UCB10" for q = 0.1.
+The script `run_allmethods.sh` can be used to launch "None", "Concentration", "Constant", and "Spatial" in parallel:
+```
+bash run_allmethods.sh goldsteinprice 100 EI
+```
