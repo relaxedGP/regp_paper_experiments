@@ -20,7 +20,7 @@ n_runs_max = 1000
 # Settings default values and types for different options
 env_options = {
     "ALGO": ("EI", str),
-    "OUTPUT_DIR": ("output", str),
+    "OUTPUT_DIR": ("results", str),
     "N_EVALUATIONS": (300, int),
     "SLURM_ARRAY_TASK_ID": (None, int),
     "N_RUNS": (1, int),
