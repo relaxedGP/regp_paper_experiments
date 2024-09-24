@@ -92,3 +92,21 @@ The script `run_allmethods.sh` can be used to launch "None", "Concentration", "C
 ```
 bash run_allmethods.sh goldsteinprice 100 EI
 ```
+Note that these bash scripts use the `python3` command.
+
+### Plotting the results
+
+The `.pgf` figures showing the results of the benchmarks can be reproduced using the scripts in `utils/analysis`.
+Assume the results are stored in the `results` folder at the root of the repos and
+`figures_path` is the folder where the `.pgf` files should be stored.
+For EI and UCB, on can use:
+```
+cd utils/analysis
+python3 -u plot_optim.py EI ../../results figures_path
+```
+For the straddle heuristic, one can run:
+```
+cd utils/analysis
+python3 -u plot_levelset.py c6 ../../results figures_path
+```
+Run the same command for the other test functions.
