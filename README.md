@@ -44,18 +44,18 @@ pip3 install -e gpmp-contrib
 
 ### Reproducing the benchmarks
 
-The numerical experiments for the three benchmarks from the article can be run using the script: `run/bench.py`.
-The folder `results` must be created for the results to be stored.
+The three benchmarks of the article can be run using the script `run/bench.py`.
+The folder `results` must be created for storage.
 
 #### Expected Improvement benchmark
 
-The EGO algorithm and the three EGO-R variants introduced in the article can be run using the script: `run/bench.py`.
-For running one repetition of the *concentration* heuristic on the *Goldstein-Price* function, one can use:
+The EGO algorithm and the three EGO-R variants introduced in the article can be run using the script `run/bench.py`.
+To run one repetition of the *concentration* heuristic on the *Goldstein-Price* function, one can use
 ```
 PYTHONPATH=utils SMC_METHOD=restart problem=goldsteinprice ALGO=EI STRATEGY=Concentration python3 -u run/bench.py
 ```
 The two other reGP variants are run by setting `STRATEGY=Constant` and `STRATEGY=Spatial`.
-The traditional EGO algorithm is run using by setting `STRATEGY=None`.
+The traditional EGO algorithm is run by setting `STRATEGY=None`.
 
 The file `optim_cases.txt` details the keywords for the other test functions from the article.
 
@@ -70,7 +70,7 @@ Other quantile levels can be used. For instance, the argument `ALGO=UCB1` stands
 
 #### Straddle benchmark
 
-The straddle benchmark can be reproduced similarly. For the `c6` test function, run:
+The straddle benchmark can be reproduced similarly. For the `c6` test function, run
 ```
 PYTHONPATH=utils problem=c6 ALGO=straddle STRATEGY=Concentration SMC_METHOD=subset ../PycharmProjects/gpmp/Scripts/python.exe -u run/bench.py
 ```
@@ -79,12 +79,12 @@ The argument `problem=goldsteinprice-1000` can be used to run the straddle heuri
 The corresponding argument is `problem=goldstein_price_log-6.90775` for the log version.
 The straddle heuristic can be run with other threshold values for the Goldstein-Price function and its log version.
 
-##### Lauching using SLURM
+##### Launching multiple repetitions using SLURM
 
 The previous commands can be used to launch a single repetition of sequential design-of-experiments strategies.
 Several repetitions can be launched in parallel using SLURM.
 For instance, one can launch 100 repetitions of EGO-R with the concentration heuristic on the Goldstein-Price function
-using:
+using
 ```
 bash run_method.sh results goldsteinprice Concentration 100 EI
 ```
@@ -99,12 +99,12 @@ Note that these bash scripts use the `python3` command.
 The `.pgf` figures showing the results of the benchmarks can be reproduced using the scripts in `utils/analysis`.
 Assume the results are stored in the `results` folder at the root of the repos and
 `figures_path` is the folder where the `.pgf` files should be stored.
-For EI and UCB, on can use:
+For EI and UCB, one can use
 ```
 cd utils/analysis
 python3 -u plot_optim.py EI ../../results figures_path
 ```
-For the straddle heuristic, one can run:
+For the straddle heuristic, one can run
 ```
 cd utils/analysis
 python3 -u plot_levelset.py c6 ../../results figures_path
