@@ -2,19 +2,20 @@
 
 This repository contains the scripts used for the numerical benchmarks of the article:
 
-Sébastien J. Petit (§), Julien Bect (†), and Emmanuel Vazquez (†)
-**Relaxed Gaussian Process Interpolation: a Goal-Oriented Approach to Bayesian Optimization**
+Sébastien J. Petit (§), Julien Bect (†), and Emmanuel Vazquez (†)  
+**Relaxed Gaussian Process Interpolation: a Goal-Oriented Approach to Bayesian Optimization**  
 ([arXiv:2206.03034](https://arxiv.org/abs/2206.03034))
 
-(§) Laboratoire National de Métrologie et d’Essais, 78197 Trappes Cedex, France.\
+(§) Laboratoire National de Métrologie et d’Essais, 78197 Trappes Cedex, France.  
 (†) Université Paris-Saclay, CNRS, CentraleSupélec,
 [Laboratoire des signaux et systèmes](https://l2s.centralesupelec.fr/),
-Gif-sur-Yvette, France.  
+Gif-sur-Yvette, France.
 
 It relies on code available [here](https://github.com/relaxedGP/gpmp/tree/regp_paper_experiments)
 and [here](https://github.com/relaxedGP/gpmp-contrib/tree/regp_paper_experiments).
 
 ![Illustration](images/regp_illustration.png)
+
 
 ## Requirements
 
@@ -111,3 +112,10 @@ cd utils/analysis
 python3 -u plot_levelset.py c6 ../../results figures_path
 ```
 Run the same command for the other test functions.
+
+
+## License
+
+regp_paper_experiments is released under the [BSD-3-Clause](COPYING.md) license.
+
+_Copyright (c) 2024, LNE & CentraleSupélec_
