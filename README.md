@@ -32,10 +32,10 @@ source ./regp/bin/activate
 # conda create --prefix `pwd`/regp python=3.11
 # source activate ./regp
 
-## Install troch
+## Install torch
 pip3 install torch
 
-## Install gmpm fork
+## Install gpmp fork
 git clone -b regp_paper_experiments https://github.com/relaxedGP/gpmp.git
 pip3 install -e gpmp
 
