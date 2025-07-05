@@ -132,7 +132,12 @@ def initialize_optimization(env_options):
     else:
         raise ValueError(options["task"])
 
-    problem = getattr(test_problems, options["problem"])
+    # FIXME:() Dirty
+    if "noisy_goldstein_price" in options["problem"]:
+        noise_variance = float(options["problem"].split("-")[1])
+        problem = test_problems.noisy_goldstein_price(noise_variance)
+    else:
+        problem = getattr(test_problems, options["problem"])
 
     return problem, options, idx_run_list
 
