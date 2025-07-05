@@ -181,8 +181,15 @@ for i in idx_run_list:
     ni0 = options["n0_over_d"] * problem.input_dim
     xi = maximinlhs(problem.input_dim, ni0, problem.input_box, rng)
 
-    if options["threshold_strategy"] == "None":
-        model = gpc.Model_ConstantMeanMaternpML(
+    if "None" in options["threshold_strategy"]:
+        if options["threshold_strategy"] == "None":
+            model_class = gpc.Model_ConstantMeanMaternpML
+        elif options["threshold_strategy"] == "None-Noisy":
+            model_class = gpc.NoisyModel_ConstantMeanMaternpML
+        else:
+            raise ValueError(options["threshold_strategy"])
+
+        model = model_class(
             "GP_bench_{}".format(options["problem"]),
             output_dim=problem.output_dim,
             covariance_params={"p": 2},
@@ -190,15 +197,23 @@ for i in idx_run_list:
             box=problem.input_box
         )
     else:
+        threshold_strategy_splitted = options["threshold_strategy"].split("-")
         threshold_strategy_params = {
-            "strategy": options["threshold_strategy"] ,
-            "level": options["q_strategy_value"] ,
+            "strategy": threshold_strategy_splitted[0],
+            "level": options["q_strategy_value"],
             "n_init": ni0,
             "task": options["task"]
         }
         if options["task"] == "levelset":
             threshold_strategy_params["t"] = get_levelset_threshold(problem)
-        model = gpc.Model_ConstantMeanMaternp_reGP(
+
+        if len(threshold_strategy_splitted) == 1:
+            model_class = gpc.Model_ConstantMeanMaternp_reGP
+        else:
+            assert len(threshold_strategy_splitted) == 2 and threshold_strategy_splitted[1] == "Noisy", threshold_strategy_splitted
+            model_class = gpc.NoisyModel_ConstantMeanMaternp_reGP
+
+        model = model_class(
             threshold_strategy_params,
             "reGP_bench_{}".format(options["problem"]),
             crit_optim_options=options["crit_optim_options"],
