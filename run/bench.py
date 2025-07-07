@@ -11,6 +11,8 @@ import traceback
 from numpy.random import SeedSequence, default_rng
 from does.designs import maximinlhs, sobol
 import scipy.stats
+import gpmp.num as gnp
+import gpmpcontrib.samplingcriteria as sampcrit
 
 assert gp.num._gpmp_backend_ == "torch", "{} is used, please install Torch.".format(gp.num._gpmp_backend_)
 
@@ -241,6 +243,10 @@ for i in idx_run_list:
     meanparam_list = []
     covparam_list = []
 
+    # TODO:() Do better.
+    if "Noisy" in options["threshold_strategy"]:
+        true_value_list = []
+
     if options["task"] == "levelset":
         m = 17
         sobol_sequence = sobol(problem.input_dim, m, problem.input_box)
@@ -280,6 +286,86 @@ for i in idx_run_list:
 
                 exp_sym_diff = key_truth * (1 - gaussian_cdf) + (1 - key_truth) * gaussian_cdf
                 sym_diff_vol.append(exp_sym_diff.mean())
+
+            # TODO:() Do better.
+            if "Noisy" in options["threshold_strategy"]:
+                smc = gpmpcontrib.smc.SMC(problem.input_box)
+
+                def boxify_criterion(x):
+                   input_box = gnp.asarray(problem.input_box)
+                   b = sampcrit.isinbox(input_box, x)
+
+                   res, _ = algo.predict(x, convert_out=False)
+
+                   res = - res.flatten()
+
+                   res = gnp.where(gnp.asarray(b), res, - gnp.inf)
+
+                   return res
+
+                smc.subset(
+                   func=boxify_criterion,
+                   target=np.inf,
+                   p0=0.2,
+                   xi=algo.xi,
+                   debug=False
+                )
+
+                zpm, _ = algo.predict(smc.particles.x, convert_out=False)
+
+                assert not gnp.isnan(zpm).any()
+
+                x_new = smc.particles.x[gnp.argmin(gnp.asarray(zpm))].reshape(1, -1)
+
+                # print(x_new)
+                # print(algo.predict(x_new)[0])
+                # print(problem.eval(x_new))
+
+                #
+                init = gnp.to_np(x_new).ravel()
+
+                def crit_(x):
+                   x_row = x.reshape(1, -1)
+                   zpm, _ = algo.predict(x_row, convert_out=False)
+                   return zpm[0, 0]
+
+                crit_jit = gnp.jax.jit(crit_)
+
+                dcrit = gnp.jax.jit(gnp.grad(crit_jit))
+
+                box = problem.input_box
+                assert all([len(_v) == len(box[0]) for _v in box])
+
+                bounds = [tuple(box[i][k] for i in range(len(box))) for k in range(len(box[0]))]
+                model_argmin = gp.kernel.autoselect_parameters(
+                   init, crit_jit, dcrit, bounds=bounds
+                )
+
+                if gnp.numpy.isnan(model_argmin).any():
+                   minimizer = init
+
+                for i in range(model_argmin.shape[0]):
+                   if model_argmin[i] < bounds[i][0]:
+                       model_argmin[i] = bounds[i][0]
+                   if bounds[i][1] < model_argmin[i]:
+                       model_argmin[i] = bounds[i][1]
+
+                if crit_(model_argmin) < crit_(init):
+                   minimizer = model_argmin
+                else:
+                   minimizer = init
+
+                minimizer = gnp.asarray(minimizer.reshape(1, -1))
+
+                # print(minimizer)
+                # print(algo.predict(minimizer)[0])
+                # print(problem.eval(minimizer))
+
+                # FIXME() !
+                noiseless_problem = test_problems.goldsteinprice
+
+                true_value_list.append(noiseless_problem.eval(minimizer))
+
 
         except gp.num.GnpLinalgError as e:
             i_error_path = os.path.join(options["output_dir"], str(i))
@@ -340,6 +426,13 @@ for i in idx_run_list:
             if os.path.exists(sym_diff_vol_path):
                 os.remove(sym_diff_vol_path)
             np.save(sym_diff_vol_path, np.array(sym_diff_vol))
+
+        # TODO:() Do better.
+        if "Noisy" in options["threshold_strategy"]:
+            true_value_path = os.path.join(options["output_dir"], "truevalue_{}.npy".format(str(i)))
+            if os.path.exists(true_value_path):
+                os.remove(true_value_path)
+            np.save(true_value_path, np.array(true_value_list))
 
     # endfor
 
