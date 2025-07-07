@@ -55,6 +55,11 @@ def get_test_function_format(x):
         func_name = 'Rosenbrock'
     elif 'ackley' in x:
         func_name = 'Ackley'
+    elif "noisy_goldstein_price" in x:
+        noise_std = np.sqrt(float(x.split("-")[1]))
+        if noise_std.is_integer():
+            noise_std = round(noise_std)
+        return r"Noisy Goldstein-Price ($\eta = {}$)".format(noise_std)
     else:
         raise ValueError(x)
 
@@ -147,6 +152,40 @@ def get_cummins(data_dir, n_runs, max_f_evals):
 def get_cummin_statistics(data_dir, n_runs, max_f_evals):
     cummins = get_cummins(data_dir, n_runs, max_f_evals)
     return np.quantile(cummins, 0.1, axis=0), np.quantile(cummins, 0.5, axis=0), np.quantile(cummins, 0.9, axis=0)
+
+def get_optim_statistics(data_dir, n_runs, max_f_evals):
+    values = fetch_data(data_dir, n_runs)
+
+    # FIXME:()
+    # assert all([_values.shape == values[0].shape for _values in values]), [_values.shape for _values in values]
+    for i in range(len(values)):
+        _values = values[i]
+        if len(_values) < max_f_evals:
+            inf_padding = (max_f_evals - _values.shape[0]) * [np.inf]
+            inf_padding = np.array(inf_padding)
+
+            _values = np.concatenate((_values, inf_padding))
+            values[i] = _values
+
+    values = np.array(values)
+
+    # Expose?
+    n_bootstrap = 100
+
+    lower_q = np.zeros([values.shape[1]])
+    median = np.zeros([values.shape[1]])
+    upper_q = np.zeros([values.shape[1]])
+
+    for i in range(values.shape[1]):
+        _medians = []
+        for j in range(n_bootstrap):
+            samples = np.random.choice(values[:, i], size=values[:, i].shape[0], replace=True)
+            _medians.append(np.quantile(samples, 0.5))
+        lower_q[i] = np.quantile(_medians, 0.1)
+        median[i] = np.quantile(_medians, 0.5)
+        upper_q[i] = np.quantile(_medians, 0.9)
+
+    return lower_q, median, upper_q
 
 def get_format_data(data_dir, targets, max_f_evals, n_runs):
     runs_data = fetch_data(data_dir, n_runs)
@@ -318,6 +357,49 @@ def plot_cummin(
 
     # ax2.invert_xaxis()
     # ax2.semilogx()
+
+def plot_noisy_optim(
+        palette,
+        max_f_evals,
+        test_function,
+        upper_threshold,
+        n_runs,
+        n0_over_dim
+    ):
+    """
+    palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
+    """
+
+    # Get dimension
+        # FIXME:() Dirty
+    if "noisy_goldstein_price" in test_function:
+        noise_variance = float(test_function.split("-")[1])
+        problem = optim_test_problems.noisy_goldstein_price(noise_variance)
+    else:
+        problem = getattr(optim_test_problems, test_function)
+
+    dim = problem.input_dim
+
+    statistics = {k: get_optim_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
+
+    plt.figure(figsize=(3.0, 2.6))
+    plt.title(get_test_function_format(test_function))
+
+    for k in statistics.keys():
+        lower_q, med, upper_q = statistics[k]
+
+        # Filter out initial DoE
+        lower_q = lower_q[n0_over_dim * dim:]
+        med = med[n0_over_dim * dim:]
+        upper_q = upper_q[n0_over_dim * dim:]
+
+        # Plot
+        abscissa = list(range(n0_over_dim * dim, max_f_evals))
+        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+
+        if upper_threshold is not None:
+            plt.ylim(lower_q.min(), upper_threshold)
 
 def investigate_multi_modal_optim(
         palette,
