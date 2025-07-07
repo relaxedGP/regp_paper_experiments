@@ -336,7 +336,7 @@ for i in idx_run_list:
                 box = problem.input_box
                 assert all([len(_v) == len(box[0]) for _v in box])
 
-                bounds = [tuple(box[i][k] for i in range(len(box))) for k in range(len(box[0]))]
+                bounds = [tuple(box[_i][k] for _i in range(len(box))) for k in range(len(box[0]))]
                 model_argmin = gp.kernel.autoselect_parameters(
                    init, crit_jit, dcrit, bounds=bounds
                 )
@@ -344,11 +344,11 @@ for i in idx_run_list:
                 if gnp.numpy.isnan(model_argmin).any():
                    minimizer = init
 
-                for i in range(model_argmin.shape[0]):
-                   if model_argmin[i] < bounds[i][0]:
-                       model_argmin[i] = bounds[i][0]
-                   if bounds[i][1] < model_argmin[i]:
-                       model_argmin[i] = bounds[i][1]
+                for _i in range(model_argmin.shape[0]):
+                   if model_argmin[_i] < bounds[_i][0]:
+                       model_argmin[_i] = bounds[_i][0]
+                   if bounds[_i][1] < model_argmin[_i]:
+                       model_argmin[_i] = bounds[_i][1]
 
                 if crit_(model_argmin) < crit_(init):
                    minimizer = model_argmin
