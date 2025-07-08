@@ -135,9 +135,10 @@ def initialize_optimization(env_options):
         raise ValueError(options["task"])
 
     # FIXME:() Dirty
-    if "noisy_goldstein_price" in options["problem"]:
+    if "noisy_" in options["problem"]:
         noise_variance = float(options["problem"].split("-")[1])
-        problem = test_problems.noisy_goldstein_price(noise_variance)
+        problem_name = options["problem"].split("-")[0]
+        problem = getattr(test_problems, problem_name)(noise_variance)
     else:
         problem = getattr(test_problems, options["problem"])
 
@@ -244,8 +245,9 @@ for i in idx_run_list:
     covparam_list = []
 
     # TODO:() Do better.
-    if "Noisy" in options["threshold_strategy"]:
+    if "noisy_" in options["problem"]:
         true_value_list = []
+        estimated_value_list = []
 
     if options["task"] == "levelset":
         m = 17
@@ -288,7 +290,17 @@ for i in idx_run_list:
                 sym_diff_vol.append(exp_sym_diff.mean())
 
             # TODO:() Do better.
-            if "Noisy" in options["threshold_strategy"]:
+            if "noisy_" in options["problem"]:
+                # TODO:() Do better.
+                if options["problem"].split("-")[0] == "noisy_goldstein_price":
+                    noiseless_problem_name = "goldsteinprice"
+                elif options["problem"].split("-")[0] == "noisy_goldstein_price_log":
+                    noiseless_problem_name = "goldstein_price_log"
+                else:
+                    raise ValueError(options["problem"])
+
+                noiseless_problem = getattr(test_problems, noiseless_problem_name)
+
                 smc = gpmpcontrib.smc.SMC(problem.input_box)
 
                 def boxify_criterion(x):
@@ -361,11 +373,8 @@ for i in idx_run_list:
                 # print(algo.predict(minimizer)[0])
                 # print(problem.eval(minimizer))
 
-                # FIXME() !
-                noiseless_problem = test_problems.goldsteinprice
-
                 true_value_list.append(noiseless_problem.eval(minimizer))
-
+                estimated_value_list.append(algo.predict(minimizer)[0][0, 0])
 
         except gp.num.GnpLinalgError as e:
             i_error_path = os.path.join(options["output_dir"], str(i))
@@ -433,6 +442,11 @@ for i in idx_run_list:
             if os.path.exists(true_value_path):
                 os.remove(true_value_path)
             np.save(true_value_path, np.array(true_value_list))
+
+            estimated_value_path = os.path.join(options["output_dir"], "estimatedvalue_{}.npy".format(str(i)))
+            if os.path.exists(estimated_value_path):
+                os.remove(estimated_value_path)
+            np.save(estimated_value_path, np.array(estimated_value_list))
 
     # endfor
 
