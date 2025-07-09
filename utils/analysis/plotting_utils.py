@@ -496,7 +496,7 @@ def plot_error_on_estimated_minimizer(
     error_on_estimated_min = {k: get_error_estimated_min_statistics(palette[k][0], n_runs, max_f_evals)
                               for k in palette.keys()}
 
-    # dim = problem.input_dim
+    dim = problem.input_dim
 
     # # level = 0.66
     #
