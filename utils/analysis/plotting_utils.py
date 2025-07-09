@@ -55,11 +55,16 @@ def get_test_function_format(x):
         func_name = 'Rosenbrock'
     elif 'ackley' in x:
         func_name = 'Ackley'
-    elif "noisy_goldstein_price" in x:
+    elif x.split("-")[0] == "noisy_goldstein_price":
         noise_std = np.sqrt(float(x.split("-")[1]))
         if noise_std.is_integer():
             noise_std = round(noise_std)
         return r"Noisy Goldstein-Price ($\eta = {}$)".format(noise_std)
+    elif x.split("-")[0] == "noisy_goldstein_price_log":
+        noise_std = np.sqrt(float(x.split("-")[1]))
+        if noise_std.is_integer():
+            noise_std = round(noise_std)
+        return r"Noisy Log-Goldstein-Price ($\eta = {}$)".format(noise_std)
     else:
         raise ValueError(x)
 
@@ -156,36 +161,35 @@ def get_cummin_statistics(data_dir, n_runs, max_f_evals):
 def get_optim_statistics(data_dir, n_runs, max_f_evals):
     values = fetch_data(data_dir, n_runs)
 
-    # FIXME:()
-    # assert all([_values.shape == values[0].shape for _values in values]), [_values.shape for _values in values]
-    for i in range(len(values)):
-        _values = values[i]
-        if len(_values) < max_f_evals:
-            inf_padding = (max_f_evals - _values.shape[0]) * [np.inf]
-            inf_padding = np.array(inf_padding)
-
-            _values = np.concatenate((_values, inf_padding))
-            values[i] = _values
+    assert all([_values.shape == values[0].shape for _values in values]), [_values.shape for _values in values]
+    # for i in range(len(values)):
+    #     _values = values[i]
+    #     if len(_values) < max_f_evals:
+    #         inf_padding = (max_f_evals - _values.shape[0]) * [np.inf]
+    #         inf_padding = np.array(inf_padding)
+    #
+    #         _values = np.concatenate((_values, inf_padding))
+    #         values[i] = _values
 
     values = np.array(values)
 
-    # Expose?
-    n_bootstrap = 100
+    # # Expose?
+    # n_bootstrap = 100
+    #
+    # lower_q = np.zeros([values.shape[1]])
+    # median = np.zeros([values.shape[1]])
+    # upper_q = np.zeros([values.shape[1]])
+    #
+    # for i in range(values.shape[1]):
+    #     _medians = []
+    #     for j in range(n_bootstrap):
+    #         samples = np.random.choice(values[:, i], size=values[:, i].shape[0], replace=True)
+    #         _medians.append(np.quantile(samples, 0.5))
+    #     lower_q[i] = np.quantile(_medians, 0.1)
+    #     median[i] = np.quantile(_medians, 0.5)
+    #     upper_q[i] = np.quantile(_medians, 0.9)
 
-    lower_q = np.zeros([values.shape[1]])
-    median = np.zeros([values.shape[1]])
-    upper_q = np.zeros([values.shape[1]])
-
-    for i in range(values.shape[1]):
-        _medians = []
-        for j in range(n_bootstrap):
-            samples = np.random.choice(values[:, i], size=values[:, i].shape[0], replace=True)
-            _medians.append(np.quantile(samples, 0.5))
-        lower_q[i] = np.quantile(_medians, 0.1)
-        median[i] = np.quantile(_medians, 0.5)
-        upper_q[i] = np.quantile(_medians, 0.9)
-
-    return lower_q, median, upper_q
+    return np.quantile(values, 0.1, axis=0), np.quantile(values, 0.5, axis=0), np.quantile(values, 0.9, axis=0)
 
 def get_format_data(data_dir, targets, max_f_evals, n_runs):
     runs_data = fetch_data(data_dir, n_runs)
@@ -371,10 +375,15 @@ def plot_noisy_optim(
     """
 
     # Get dimension
-        # FIXME:() Dirty
-    if "noisy_goldstein_price" in test_function:
+    # FIXME:() Dirty
+    if test_function.split("-")[0] == "noisy_goldstein_price":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_goldstein_price(noise_variance)
+        global_minimum = 3.0
+    elif test_function.split("-")[0] == "noisy_goldstein_price_log":
+        noise_variance = float(test_function.split("-")[1])
+        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance)
+        global_minimum = np.log(3.0)
     else:
         problem = getattr(optim_test_problems, test_function)
 
@@ -400,6 +409,9 @@ def plot_noisy_optim(
 
         if upper_threshold is not None:
             plt.ylim(lower_q.min(), upper_threshold)
+
+    plt.axhline(global_minimum + np.sqrt(noise_variance), color="orange", linestyle="dashed")
+    plt.axhline(global_minimum + 2 * np.sqrt(noise_variance), color="orange", linestyle="dashed")
 
 def investigate_multi_modal_optim(
         palette,
