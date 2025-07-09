@@ -1,5 +1,5 @@
 import sys, os
-from plotting_utils import plot_noisy_optim
+from plotting_utils import plot_noisy_optim, plot_value_of_estimated_minimizer, plot_error_on_estimated_minimizer
 
 sequential_strategy = sys.argv[1]
 data_dir = sys.argv[2]
@@ -35,7 +35,7 @@ def get_key_value(regp_method, test_function, sequential_strategy):
 
     return key, value
 
-def plot_test_function(test_function, upper_threshold, sequential_strategy):
+def plot_test_function(test_function, upper_threshold, sequential_strategy, show):
     palette = {}
     for regp_method in ["Constant-Noisy", "Spatial-Noisy", "None-Noisy", "Concentration-Noisy"]:
         key, value = get_key_value(regp_method, test_function, sequential_strategy)
@@ -49,6 +49,41 @@ def plot_test_function(test_function, upper_threshold, sequential_strategy):
         30,
         10
     )
+    plt.tight_layout()
+    if show:
+        plt.show()
+    else:
+        # plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function)))
+        plt.close()
+
+    plot_value_of_estimated_minimizer(
+        palette,
+        300,
+        test_function,
+        30,
+        10
+    )
+    plt.tight_layout()
+    if show:
+        plt.show()
+    else:
+        # plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function)))
+        plt.close()
+
+    plot_error_on_estimated_minimizer(
+        palette,
+        300,
+        test_function,
+        30,
+        10
+    )
+    plt.tight_layout()
+    if show:
+        plt.show()
+    else:
+        # plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function)))
+        plt.close()
+
 
 test_functions = []
 
@@ -59,10 +94,4 @@ else:
     show = False
 
 for test_function in test_functions:
-    plot_test_function(test_function[0], test_function[1], sequential_strategy)
-    plt.tight_layout()
-    if show:
-        plt.show()
-    else:
-        plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function)))
-        plt.close()
+    plot_test_function(test_function[0], test_function[1], sequential_strategy, show)
