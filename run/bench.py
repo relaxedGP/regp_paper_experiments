@@ -302,6 +302,8 @@ for i in idx_run_list:
                     noiseless_problem_name = "goldsteinprice"
                 elif options["problem"].split("-")[0] == "noisy_goldstein_price_log":
                     noiseless_problem_name = "goldstein_price_log"
+                elif options["problem"].split("-")[0] == "noisy_beale":
+                    noiseless_problem_name = "beale"
                 else:
                     raise ValueError(options["problem"])
 
