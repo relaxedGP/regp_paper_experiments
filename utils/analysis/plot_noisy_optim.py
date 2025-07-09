@@ -23,7 +23,7 @@ else:
 
 import matplotlib.pyplot as plt
 
-regp_methods_palette = {"Concentration-Noisy": "g", "Constant-Noisy": "b", "None-Noisy": "r"}
+regp_methods_palette = {"Concentration-Noisy": "g", "Constant-Noisy": "b", "Spatial-Noisy": "k", "None-Noisy": "r"}
 sequential_strategies_palette = {"UCB10": "solid"}
 
 def get_key_value(regp_method, test_function, sequential_strategy):
@@ -37,7 +37,7 @@ def get_key_value(regp_method, test_function, sequential_strategy):
 
 def plot_test_function(test_function, upper_threshold, sequential_strategy):
     palette = {}
-    for regp_method in ["Constant-Noisy", "None-Noisy", "Concentration-Noisy"]:
+    for regp_method in ["Constant-Noisy", "Spatial-Noisy", "None-Noisy", "Concentration-Noisy"]:
         key, value = get_key_value(regp_method, test_function, sequential_strategy)
         palette[key] = value
 
