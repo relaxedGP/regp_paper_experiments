@@ -134,15 +134,18 @@ def initialize_optimization(env_options):
     else:
         raise ValueError(options["task"])
 
+    return options, idx_run_list
+
+def get_problem(options, rng):
     # FIXME:() Dirty
     if "noisy_" in options["problem"]:
         noise_variance = float(options["problem"].split("-")[1])
         problem_name = options["problem"].split("-")[0]
-        problem = getattr(test_problems, problem_name)(noise_variance)
+        problem = getattr(test_problems, problem_name)(noise_variance, rng)
     else:
         problem = getattr(test_problems, options["problem"])
 
-    return problem, options, idx_run_list
+    return problem
 
 def get_algo(problem, model, options):
     algo_name = options["algo"]
@@ -178,12 +181,15 @@ def get_levelset_threshold(problem):
     return bounds[0][1]
 
 # --------------------------------------------------------------------------------------
-problem, options, idx_run_list = initialize_optimization(env_options)
+options, idx_run_list = initialize_optimization(env_options)
 
 
 # Repetition Loop
 for i in idx_run_list:
     rng = get_rng(i, n_runs_max)
+
+    problem = get_problem(options, rng)
+
     options["algo_options"]["smc_options"]["rng"] = rng
 
     ni0 = options["n0_over_d"] * problem.input_dim
