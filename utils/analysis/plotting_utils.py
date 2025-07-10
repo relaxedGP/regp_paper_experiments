@@ -65,6 +65,11 @@ def get_test_function_format(x):
         if noise_std.is_integer():
             noise_std = round(noise_std)
         return r"Noisy Log-Goldstein-Price ($\eta = {}$)".format(noise_std)
+    elif x.split("-")[0] == "noisy_beale":
+        noise_std = np.sqrt(float(x.split("-")[1]))
+        if noise_std.is_integer():
+            noise_std = round(noise_std)
+        return r"Noisy Beale ($\eta = {}$)".format(noise_std)
     else:
         raise ValueError(x)
 
@@ -404,14 +409,19 @@ def plot_value_of_estimated_minimizer(
     # FIXME:() Dirty
     if test_function.split("-")[0] == "noisy_goldstein_price":
         noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price(noise_variance)
+        problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
         global_minimum = 3.0
         noiseless_test_function_name = "goldsteinprice"
     elif test_function.split("-")[0] == "noisy_goldstein_price_log":
         noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance)
+        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
         global_minimum = np.log(3.0)
         noiseless_test_function_name = "goldstein_price_log"
+    elif test_function.split("-")[0] == "noisy_beale":
+        noise_variance = float(test_function.split("-")[1])
+        problem = optim_test_problems.noisy_beale(noise_variance, None)
+        global_minimum = 0.0
+        noiseless_test_function_name = "beale"
     else:
         problem = getattr(optim_test_problems, test_function)
 
@@ -479,14 +489,19 @@ def plot_error_on_estimated_minimizer(
     # FIXME:() Dirty
     if test_function.split("-")[0] == "noisy_goldstein_price":
         noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price(noise_variance)
+        problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
         global_minimum = 3.0
         noiseless_test_function_name = "goldsteinprice"
     elif test_function.split("-")[0] == "noisy_goldstein_price_log":
         noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance)
+        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
         global_minimum = np.log(3.0)
         noiseless_test_function_name = "goldstein_price_log"
+    elif test_function.split("-")[0] == "noisy_beale":
+        noise_variance = float(test_function.split("-")[1])
+        problem = optim_test_problems.noisy_beale(noise_variance, None)
+        global_minimum = 0
+        noiseless_test_function_name = "beale"
     else:
         problem = getattr(optim_test_problems, test_function)
 
@@ -552,12 +567,16 @@ def plot_noisy_optim(
     # FIXME:() Dirty
     if test_function.split("-")[0] == "noisy_goldstein_price":
         noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price(noise_variance)
+        problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
         global_minimum = 3.0
     elif test_function.split("-")[0] == "noisy_goldstein_price_log":
         noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance)
+        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
         global_minimum = np.log(3.0)
+    elif test_function.split("-")[0] == "noisy_beale":
+        noise_variance = float(test_function.split("-")[1])
+        problem = optim_test_problems.noisy_beale(noise_variance, None)
+        global_minimum = 0.0
     else:
         problem = getattr(optim_test_problems, test_function)
 
