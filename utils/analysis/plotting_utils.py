@@ -563,7 +563,6 @@ def plot_noisy_optim(
         palette,
         max_f_evals,
         test_function,
-        upper_threshold,
         n_runs,
         n0_over_dim
     ):
@@ -578,11 +577,13 @@ def plot_noisy_optim(
         problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
         yticks = [300, 500]
         global_minimum = 3.0
+        upper_threshold = 600
     elif test_function.split("-")[0] == "noisy_goldstein_price_log":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
         global_minimum = np.log(3.0)
         yticks = [10, 15]
+        upper_threshold = None
     elif test_function.split("-")[0] == "noisy_beale":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_beale(noise_variance, None)
