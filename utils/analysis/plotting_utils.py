@@ -247,7 +247,7 @@ def plot_cummin(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
-    legend_list = ["camel_back", "goldstein_price_log", "michalewicz6", "rosenbrock10", "zakharov10"]
+    legend_list = ["ackley10", "dixon_price10", "michalewicz6", "rosenbrock10", "zakharov10"]
 
     # Get dimension
     problem = getattr(optim_test_problems, test_function)
