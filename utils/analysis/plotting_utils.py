@@ -247,6 +247,8 @@ def plot_cummin(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
+    legend_list = ["camel_back", "goldstein_price_log", "michalewicz6", "rosenbrock10", "zakharov10"]
+
     # Get dimension
     problem = getattr(optim_test_problems, test_function)
     dim = problem.input_dim
@@ -290,7 +292,7 @@ def plot_cummin(
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
         ax1.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
-        ax1.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        ax1.plot(abscissa, med, linestyle=palette[k][1][1], color=palette[k][1][0])
 
     ax1.semilogy()
 
@@ -300,7 +302,7 @@ def plot_cummin(
     props = {k: get_format_data(palette[k][0], targets, max_f_evals, n_runs)[0] for k in palette.keys()}
     for k in palette.keys():
         _props_array = np.array(props[k])
-        ax2.plot(_props_array[key_filter], x_array[key_filter], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        ax2.plot(_props_array[key_filter], x_array[key_filter], label=format_legend(k), linestyle=palette[k][1][1], color=palette[k][1][0])
 
     # ax2.axvline(level, color='k', linestyle='dashed')
 
@@ -316,8 +318,26 @@ def plot_cummin(
         ]
     )
 
+    if test_function in legend_list:
+        ax2.legend(fontsize=7)
+
     # ax2.invert_xaxis()
     # ax2.semilogx()
+
+def format_legend(k):
+    k = k.replace(" (EI)", "")
+    k = k.replace(" (UCB10)", "")
+
+    if k == "Constant":
+        return "Const."
+    elif k == "Concentration":
+        return "Concent."
+    elif k == "None":
+        return "None"
+    elif k == "Spatial":
+        return "Spatial"
+    else:
+        raise RuntimeError(k)
 
 def investigate_multi_modal_optim(
         palette,
