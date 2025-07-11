@@ -16,9 +16,9 @@ def get_func_param(x):
 
 def get_test_function_format(x):
 
-    if x == "g10c6mod":
+    if x == "c6":
         return x
-    elif x == "g10c6modmod":
+    elif x == "c67":
         return x
     elif x == "goldsteinprice-1000":
         return 'Goldstein-Price'
@@ -322,6 +322,8 @@ def plot_cummin(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
+    legend_list = ["ackley10", "dixon_price10", "michalewicz6", "rosenbrock10", "zakharov10"]
+
     # Get dimension
     problem = getattr(optim_test_problems, test_function)
     dim = problem.input_dim
@@ -365,7 +367,7 @@ def plot_cummin(
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
         ax1.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
-        ax1.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        ax1.plot(abscissa, med, linestyle=palette[k][1][1], color=palette[k][1][0])
 
     ax1.semilogy()
 
@@ -375,7 +377,7 @@ def plot_cummin(
     props = {k: get_format_data(palette[k][0], targets, max_f_evals, n_runs)[0] for k in palette.keys()}
     for k in palette.keys():
         _props_array = np.array(props[k])
-        ax2.plot(_props_array[key_filter], x_array[key_filter], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        ax2.plot(_props_array[key_filter], x_array[key_filter], label=format_legend(k), linestyle=palette[k][1][1], color=palette[k][1][0])
 
     # ax2.axvline(level, color='k', linestyle='dashed')
 
@@ -390,6 +392,9 @@ def plot_cummin(
             matplotlib.text.Text(1.0, 0, '$\\mathdefault{1.0}$'),
         ]
     )
+
+    if test_function in legend_list:
+        ax2.legend(fontsize=7)
 
     # ax2.invert_xaxis()
     # ax2.semilogx()
@@ -615,6 +620,22 @@ def plot_noisy_optim(
        [r"${}$".format(y) for y in yticks] + [r"$\eta + \mathrm{min} \, f$", r"$\mathrm{min} \, f$"],
     )
 
+def format_legend(k):
+    k = k.replace(" (EI)", "")
+    k = k.replace(" (UCB10)", "")
+    k = k.replace(" (straddle)", "")
+
+    if k == "Constant":
+        return "Const."
+    elif k == "Concentration":
+        return "Concent."
+    elif k == "None":
+        return "None"
+    elif k == "Spatial":
+        return "Spatial"
+    else:
+        raise RuntimeError(k)
+
 def investigate_multi_modal_optim(
         palette,
         max_f_evals,
@@ -712,6 +733,8 @@ def plotter_levelset(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
+    legend_list = ["goldstein_price_log-6.90775"]
+
     plt.title(get_test_function_format(test_function))
 
     # Get dimension
@@ -725,11 +748,12 @@ def plotter_levelset(
     for k in palette.keys():
         res_k = data[k]
         plt.fill_between(abscissa, res_k[:, 0], res_k[:, 2], color=palette[k][1][0], alpha=0.2)
-        plt.plot(abscissa, res_k[:, 1], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.plot(abscissa, res_k[:, 1], label=format_legend(k), linestyle=palette[k][1][1], color=palette[k][1][0])
 
     plt.ylim([0.0004, 1])
     plt.semilogy()
 
-    # plt.legend()
+    if test_function in legend_list:
+        plt.legend()
 
     plt.tight_layout()
