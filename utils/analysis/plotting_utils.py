@@ -59,12 +59,12 @@ def get_test_function_format(x):
         noise_std = np.sqrt(float(x.split("-")[1]))
         if noise_std.is_integer():
             noise_std = round(noise_std)
-        return r"Noisy Goldstein-Price ($\eta = {}$)".format(noise_std)
+        return r"Goldstein-Price ($\eta = {}$)".format(noise_std)
     elif x.split("-")[0] == "noisy_goldstein_price_log":
         noise_std = np.sqrt(float(x.split("-")[1]))
         if noise_std.is_integer():
             noise_std = round(noise_std)
-        return r"Noisy Log-Goldstein-Price ($\eta = {}$)".format(noise_std)
+        return r"Log-Goldstein-Price ($\eta = {}$)".format(noise_std)
     elif x.split("-")[0] == "noisy_beale":
         noise_std = np.sqrt(float(x.split("-")[1]))
         if noise_std.is_integer():
@@ -468,7 +468,7 @@ def plot_value_of_estimated_minimizer(
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
-        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.3)
+        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
         plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
     plt.semilogy()
@@ -550,11 +550,11 @@ def plot_error_on_estimated_minimizer(
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
-        plt.fill_between(abscissa, abs_lower_q, abs_upper_q, color=palette[k][1][0], alpha=0.3)
-        plt.plot(abscissa, abs_med, label=k.split("-")[0], linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.fill_between(abscissa, abs_lower_q, abs_upper_q, color=palette[k][1][0], alpha=0.2)
+        plt.plot(abscissa, abs_med, label=format_legend(k.split("-")[0]), linestyle=palette[k][1][1], color=palette[k][1][0])
 
         if show_legend:
-            plt.legend()
+            plt.legend(fontsize=6)
 
         plt.semilogy()
 
@@ -606,7 +606,7 @@ def plot_noisy_optim(
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
-        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.3)
+        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
         plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
         if upper_threshold is not None:

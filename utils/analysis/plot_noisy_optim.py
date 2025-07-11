@@ -5,6 +5,14 @@ sequential_strategy = sys.argv[1]
 data_dir = sys.argv[2]
 output_dir = sys.argv[3]
 
+import matplotlib
+matplotlib.use("pgf")
+matplotlib.rcParams.update({
+    "pgf.texsystem": "pdflatex",
+    'font.family': 'serif',
+    'text.usetex': True,
+    'pgf.rcfonts': False,
+})
 import matplotlib.pyplot as plt
 
 regp_methods_palette = {"Concentration-Noisy": "g", "Constant-Noisy": "b", "Spatial-Noisy": "k", "None-Noisy": "r"}
@@ -57,8 +65,8 @@ def plot_test_function(test_function, sequential_strategy, args_list):
 
 test_functions = ["noisy_goldstein_price-10000.0", "noisy_goldstein_price_log-9.0"]
 
-plt.subplots(3, 2, sharex=True)
+plt.subplots(3, 2, sharex=True, figsize=(6, 6))
 plot_test_function(test_functions[0], sequential_strategy, [[3, 2, 1], [3, 2, 3], [3, 2, 5]])
 plot_test_function(test_functions[1], sequential_strategy, [[3, 2, 2], [3, 2, 4], [3, 2, 6]])
 plt.tight_layout()
-plt.show()
+plt.savefig(os.path.join(output_dir, "multi_noisy.pgf"))
