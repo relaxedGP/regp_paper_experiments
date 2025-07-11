@@ -6,10 +6,6 @@ data_dir = sys.argv[2]
 output_dir = sys.argv[3]
 if len(sys.argv) == 5:
     test_function = sys.argv[4]
-    upper_threshold = None
-elif len(sys.argv) == 6:
-    test_function = sys.argv[4]
-    upper_threshold = float(sys.argv[5])
 else:
     test_function = None
     import matplotlib
@@ -35,7 +31,7 @@ def get_key_value(regp_method, test_function, sequential_strategy):
 
     return key, value
 
-def plot_test_function(test_function, upper_threshold, sequential_strategy, show):
+def plot_test_function(test_function, sequential_strategy, show):
     palette = {}
     for regp_method in ["Constant-Noisy", "Spatial-Noisy", "None-Noisy", "Concentration-Noisy"]:
         key, value = get_key_value(regp_method, test_function, sequential_strategy)
@@ -45,7 +41,6 @@ def plot_test_function(test_function, upper_threshold, sequential_strategy, show
         palette,
         300,
         test_function,
-        upper_threshold,
         30,
         10
     )
@@ -88,7 +83,7 @@ def plot_test_function(test_function, upper_threshold, sequential_strategy, show
 test_functions = []
 
 if test_function is not None:
-    test_functions = [(test_function, upper_threshold)]
+    test_functions = [test_function]
     show = False
 else:
     show = False
