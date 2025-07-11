@@ -84,9 +84,9 @@ test_functions = []
 
 if test_function is not None:
     test_functions = [test_function]
-    show = False
+    show = True
 else:
     show = False
 
 for test_function in test_functions:
-    plot_test_function(test_function[0], test_function[1], sequential_strategy, show)
+    plot_test_function(test_function, sequential_strategy, show)
