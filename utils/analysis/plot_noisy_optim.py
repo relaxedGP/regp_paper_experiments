@@ -53,7 +53,7 @@ def plot_test_function(test_function, upper_threshold, sequential_strategy, show
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(output_dir, "raw-{}.pdf".format(test_function)))
+        plt.savefig(os.path.join(output_dir, "raw-{}.pdf".format(test_function.replace(".", "v"))))
         plt.close()
 
     plot_value_of_estimated_minimizer(
@@ -67,7 +67,7 @@ def plot_test_function(test_function, upper_threshold, sequential_strategy, show
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(output_dir, "perf_min-{}.pdf".format(test_function)))
+        plt.savefig(os.path.join(output_dir, "perf_min-{}.pdf".format(test_function.replace(".", "v"))))
         plt.close()
 
     plot_error_on_estimated_minimizer(
@@ -81,7 +81,7 @@ def plot_test_function(test_function, upper_threshold, sequential_strategy, show
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(output_dir, "error_min-{}.pdf".format(test_function)))
+        plt.savefig(os.path.join(output_dir, "error_min-{}.pdf".format(test_function.replace(".", "v"))))
         plt.close()
 
 
