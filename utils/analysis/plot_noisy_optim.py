@@ -89,7 +89,7 @@ test_functions = []
 
 if test_function is not None:
     test_functions = [(test_function, upper_threshold)]
-    show = True
+    show = False
 else:
     show = False
 
