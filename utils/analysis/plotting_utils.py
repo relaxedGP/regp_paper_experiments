@@ -16,9 +16,9 @@ def get_func_param(x):
 
 def get_test_function_format(x):
 
-    if x == "g10c6mod":
+    if x == "c6":
         return x
-    elif x == "g10c6modmod":
+    elif x == "c67":
         return x
     elif x == "goldsteinprice-1000":
         return 'Goldstein-Price'
@@ -327,6 +327,7 @@ def plot_cummin(
 def format_legend(k):
     k = k.replace(" (EI)", "")
     k = k.replace(" (UCB10)", "")
+    k = k.replace(" (straddle)", "")
 
     if k == "Constant":
         return "Const."
@@ -436,6 +437,8 @@ def plotter_levelset(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
+    legend_list = ["goldstein_price_log-6.90775"]
+
     plt.title(get_test_function_format(test_function))
 
     # Get dimension
@@ -449,11 +452,12 @@ def plotter_levelset(
     for k in palette.keys():
         res_k = data[k]
         plt.fill_between(abscissa, res_k[:, 0], res_k[:, 2], color=palette[k][1][0], alpha=0.2)
-        plt.plot(abscissa, res_k[:, 1], label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.plot(abscissa, res_k[:, 1], label=format_legend(k), linestyle=palette[k][1][1], color=palette[k][1][0])
 
     plt.ylim([0.0004, 1])
     plt.semilogy()
 
-    # plt.legend()
+    if test_function in legend_list:
+        plt.legend()
 
     plt.tight_layout()
