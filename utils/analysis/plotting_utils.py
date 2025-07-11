@@ -188,7 +188,7 @@ def get_error_estimated_min_statistics(data_dir, n_runs, max_f_evals):
     truth_data = np.array(truth_data)
     estimated_data = np.array(estimated_data)
     diff_data = truth_data - estimated_data
-    return np.quantile(np.abs(diff_data), 0.5, axis=0)
+    return np.quantile(np.abs(diff_data), 0.1, axis=0), np.quantile(np.abs(diff_data), 0.5, axis=0), np.quantile(np.abs(diff_data), 0.9, axis=0)
 
 def get_optim_statistics(data_dir, n_runs, max_f_evals):
     values = fetch_data(data_dir, n_runs)
@@ -437,10 +437,10 @@ def plot_value_of_estimated_minimizer(
 
     best_perf = np.inf
 
-    fig, ax = plt.subplots(1, 1, sharey=True, figsize=(3.0, 2.6))
+    fig, ax = plt.subplots(1, 1, sharey=True, figsize=(4.0, 3.0))
     ax1 = ax
 
-    plt.suptitle(get_test_function_format(test_function))
+    # plt.suptitle(get_test_function_format(test_function))
 
     # First plot
     interp = lambda x: np.interp(x, np.flip(targets), np.flip(x_array))
@@ -466,13 +466,13 @@ def plot_value_of_estimated_minimizer(
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
-        ax1.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        ax1.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.3)
         ax1.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
     ax1.semilogy()
 
-    plt.axhline(interp(global_minimum + np.sqrt(noise_variance)), color="orange", linestyle="dashed")
-    plt.axhline(interp(global_minimum + 2 * np.sqrt(noise_variance)), color="orange", linestyle="dashed")
+    # plt.axhline(interp(global_minimum + np.sqrt(noise_variance)), color="orange", linestyle="dashed")
+    # plt.axhline(interp(global_minimum + 2 * np.sqrt(noise_variance)), color="orange", linestyle="dashed")
 
 def plot_error_on_estimated_minimizer(
         palette,
@@ -490,18 +490,21 @@ def plot_error_on_estimated_minimizer(
     if test_function.split("-")[0] == "noisy_goldstein_price":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
-        global_minimum = 3.0
-        noiseless_test_function_name = "goldsteinprice"
+        # global_minimum = 3.0
+        # noiseless_test_function_name = "goldsteinprice"
+        show_legend = True
     elif test_function.split("-")[0] == "noisy_goldstein_price_log":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
-        global_minimum = np.log(3.0)
-        noiseless_test_function_name = "goldstein_price_log"
+        # global_minimum = np.log(3.0)
+        # noiseless_test_function_name = "goldstein_price_log"
+        show_legend = False
     elif test_function.split("-")[0] == "noisy_beale":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_beale(noise_variance, None)
-        global_minimum = 0
-        noiseless_test_function_name = "beale"
+        # global_minimum = 0
+        # noiseless_test_function_name = "beale"
+        show_legend = False
     else:
         problem = getattr(optim_test_problems, test_function)
 
@@ -517,16 +520,18 @@ def plot_error_on_estimated_minimizer(
     #
     # best_perf = np.inf
 
-    fig, ax = plt.subplots(1, 1, sharey=True, figsize=(3.0, 2.6))
+    fig, ax = plt.subplots(1, 1, sharey=True, figsize=(4.0, 3.0))
     ax1 = ax
 
-    plt.suptitle(get_test_function_format(test_function))
+    # plt.suptitle(get_test_function_format(test_function))
 
     ## First plot
     # interp = lambda x: np.interp(x, np.flip(targets), np.flip(x_array))
 
     for k in error_on_estimated_min.keys():
-        abs_med = error_on_estimated_min[k]
+        abs_lower_q = error_on_estimated_min[k][0]
+        abs_med = error_on_estimated_min[k][1]
+        abs_upper_q = error_on_estimated_min[k][2]
 
         # # Filter out initial DoE
         # lower_q = lower_q[n0_over_dim * dim:]
@@ -546,8 +551,11 @@ def plot_error_on_estimated_minimizer(
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
-        # ax1.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
-        ax1.plot(abscissa, abs_med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        ax1.fill_between(abscissa, abs_lower_q, abs_upper_q, color=palette[k][1][0], alpha=0.3)
+        ax1.plot(abscissa, abs_med, label=k.split("-")[0], linestyle=palette[k][1][1], color=palette[k][1][0])
+
+        if show_legend:
+            plt.legend()
 
         plt.semilogy()
 
@@ -568,11 +576,13 @@ def plot_noisy_optim(
     if test_function.split("-")[0] == "noisy_goldstein_price":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
+        yticks = [300, 500]
         global_minimum = 3.0
     elif test_function.split("-")[0] == "noisy_goldstein_price_log":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
         global_minimum = np.log(3.0)
+        yticks = [10, 15]
     elif test_function.split("-")[0] == "noisy_beale":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_beale(noise_variance, None)
@@ -584,7 +594,7 @@ def plot_noisy_optim(
 
     statistics = {k: get_optim_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
 
-    plt.figure(figsize=(3.0, 2.6))
+    plt.figure(figsize=(4.0, 3.0))
     plt.title(get_test_function_format(test_function))
 
     for k in statistics.keys():
@@ -597,14 +607,19 @@ def plot_noisy_optim(
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
-        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.3)
         plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
         if upper_threshold is not None:
             plt.ylim(lower_q.min(), upper_threshold)
 
     plt.axhline(global_minimum + np.sqrt(noise_variance), color="orange", linestyle="dashed")
-    plt.axhline(global_minimum + 2 * np.sqrt(noise_variance), color="orange", linestyle="dashed")
+    plt.axhline(global_minimum + 0, color="orange", linestyle="dashed")
+
+    plt.yticks(
+       yticks + [global_minimum + np.sqrt(noise_variance)] + [global_minimum],
+       [r"${}$".format(y) for y in yticks] + [r"$\eta + \mathrm{min} \, f$", r"$\mathrm{min} \, f$"],
+    )
 
 def investigate_multi_modal_optim(
         palette,
