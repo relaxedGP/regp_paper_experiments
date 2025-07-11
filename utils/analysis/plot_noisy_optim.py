@@ -4,18 +4,6 @@ from plotting_utils import plot_noisy_optim, plot_value_of_estimated_minimizer, 
 sequential_strategy = sys.argv[1]
 data_dir = sys.argv[2]
 output_dir = sys.argv[3]
-if len(sys.argv) == 5:
-    test_function = sys.argv[4]
-else:
-    test_function = None
-    import matplotlib
-    matplotlib.use("pgf")
-    matplotlib.rcParams.update({
-        "pgf.texsystem": "pdflatex",
-        'font.family': 'serif',
-        'text.usetex': True,
-        'pgf.rcfonts': False,
-    })
 
 import matplotlib.pyplot as plt
 
@@ -31,12 +19,13 @@ def get_key_value(regp_method, test_function, sequential_strategy):
 
     return key, value
 
-def plot_test_function(test_function, sequential_strategy, show):
+def plot_test_function(test_function, sequential_strategy, args_list):
     palette = {}
     for regp_method in ["Constant-Noisy", "Spatial-Noisy", "None-Noisy", "Concentration-Noisy"]:
         key, value = get_key_value(regp_method, test_function, sequential_strategy)
         palette[key] = value
 
+    plt.subplot(*args_list[0])
     plot_noisy_optim(
         palette,
         300,
@@ -45,12 +34,8 @@ def plot_test_function(test_function, sequential_strategy, show):
         10
     )
     plt.tight_layout()
-    if show:
-        plt.show()
-    else:
-        plt.savefig(os.path.join(output_dir, "raw-{}.pdf".format(test_function.replace(".", "v"))))
-        plt.close()
 
+    plt.subplot(*args_list[1])
     plot_value_of_estimated_minimizer(
         palette,
         300,
@@ -59,12 +44,8 @@ def plot_test_function(test_function, sequential_strategy, show):
         10
     )
     plt.tight_layout()
-    if show:
-        plt.show()
-    else:
-        plt.savefig(os.path.join(output_dir, "perf_min-{}.pdf".format(test_function.replace(".", "v"))))
-        plt.close()
 
+    plt.subplot(*args_list[2])
     plot_error_on_estimated_minimizer(
         palette,
         300,
@@ -73,20 +54,11 @@ def plot_test_function(test_function, sequential_strategy, show):
         10
     )
     plt.tight_layout()
-    if show:
-        plt.show()
-    else:
-        plt.savefig(os.path.join(output_dir, "error_min-{}.pdf".format(test_function.replace(".", "v"))))
-        plt.close()
 
+test_functions = ["noisy_goldstein_price-10000.0", "noisy_goldstein_price_log-9.0"]
 
-test_functions = []
-
-if test_function is not None:
-    test_functions = [test_function]
-    show = True
-else:
-    show = False
-
-for test_function in test_functions:
-    plot_test_function(test_function, sequential_strategy, show)
+plt.subplots(3, 2, sharex=True)
+plot_test_function(test_functions[0], sequential_strategy, [[3, 2, 1], [3, 2, 3], [3, 2, 5]])
+plot_test_function(test_functions[1], sequential_strategy, [[3, 2, 2], [3, 2, 4], [3, 2, 6]])
+plt.tight_layout()
+plt.show()

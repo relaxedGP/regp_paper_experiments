@@ -437,9 +437,6 @@ def plot_value_of_estimated_minimizer(
 
     best_perf = np.inf
 
-    fig, ax = plt.subplots(1, 1, sharey=True, figsize=(4.0, 3.0))
-    ax1 = ax
-
     # plt.suptitle(get_test_function_format(test_function))
 
     # First plot
@@ -466,10 +463,10 @@ def plot_value_of_estimated_minimizer(
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
-        ax1.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.3)
-        ax1.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.3)
+        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
-    ax1.semilogy()
+    plt.semilogy()
 
     # plt.axhline(interp(global_minimum + np.sqrt(noise_variance)), color="orange", linestyle="dashed")
     # plt.axhline(interp(global_minimum + 2 * np.sqrt(noise_variance)), color="orange", linestyle="dashed")
@@ -520,9 +517,6 @@ def plot_error_on_estimated_minimizer(
     #
     # best_perf = np.inf
 
-    fig, ax = plt.subplots(1, 1, sharey=True, figsize=(4.0, 3.0))
-    ax1 = ax
-
     # plt.suptitle(get_test_function_format(test_function))
 
     ## First plot
@@ -551,8 +545,8 @@ def plot_error_on_estimated_minimizer(
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
-        ax1.fill_between(abscissa, abs_lower_q, abs_upper_q, color=palette[k][1][0], alpha=0.3)
-        ax1.plot(abscissa, abs_med, label=k.split("-")[0], linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.fill_between(abscissa, abs_lower_q, abs_upper_q, color=palette[k][1][0], alpha=0.3)
+        plt.plot(abscissa, abs_med, label=k.split("-")[0], linestyle=palette[k][1][1], color=palette[k][1][0])
 
         if show_legend:
             plt.legend()
@@ -595,7 +589,6 @@ def plot_noisy_optim(
 
     statistics = {k: get_optim_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
 
-    plt.figure(figsize=(4.0, 3.0))
     plt.title(get_test_function_format(test_function))
 
     for k in statistics.keys():
