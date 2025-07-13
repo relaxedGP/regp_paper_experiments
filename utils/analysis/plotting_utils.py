@@ -626,13 +626,13 @@ def format_legend(k):
     k = k.replace(" (straddle)", "")
 
     if k == "Constant":
-        return "Const."
+        return "const."
     elif k == "Concentration":
-        return "Concent."
+        return "concent."
     elif k == "None":
-        return "None"
+        return "GP"
     elif k == "Spatial":
-        return "Spatial"
+        return "spatial"
     else:
         raise RuntimeError(k)
 
