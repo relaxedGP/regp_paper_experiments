@@ -17,9 +17,9 @@ def get_func_param(x):
 def get_test_function_format(x):
 
     if x == "c6":
-        return x
+        return r"$c_6$"
     elif x == "c67":
-        return x
+        return r"$c_6^7$"
     elif x == "goldsteinprice-1000":
         return 'Goldstein-Price'
     elif x == "goldstein_price_log-6.90775":
