@@ -473,6 +473,8 @@ def plot_value_of_estimated_minimizer(
 
     plt.semilogy()
 
+    plt.ylabel(r"$f(x_n^{\star})$")
+
     # plt.axhline(interp(global_minimum + np.sqrt(noise_variance)), color="orange", linestyle="dashed")
     # plt.axhline(interp(global_minimum + 2 * np.sqrt(noise_variance)), color="orange", linestyle="dashed")
 
@@ -558,6 +560,8 @@ def plot_error_on_estimated_minimizer(
 
         plt.semilogy()
 
+    plt.ylabel(r"$\left| f(x_n^{\star}) - \mu_n(x_n^{\star}) \right|$")
+
 def plot_noisy_optim(
         palette,
         max_f_evals,
@@ -619,6 +623,8 @@ def plot_noisy_optim(
        yticks + [global_minimum + np.sqrt(noise_variance)] + [global_minimum],
        [r"${}$".format(y) for y in yticks] + [r"$\eta + \mathrm{min} \, f$", r"$\mathrm{min} \, f$"],
     )
+
+    plt.ylabel(r"$f(x_n) + \epsilon_n$")
 
 def format_legend(k):
     k = k.replace(" (EI)", "")
