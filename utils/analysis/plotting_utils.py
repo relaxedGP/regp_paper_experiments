@@ -404,7 +404,8 @@ def plot_value_of_estimated_minimizer(
         max_f_evals,
         test_function,
         n_runs,
-        n0_over_dim
+        n0_over_dim,
+        y_label
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
@@ -473,17 +474,21 @@ def plot_value_of_estimated_minimizer(
 
     plt.semilogy()
 
-    plt.ylabel(r"$f(x_n^{\star})$")
+    if y_label:
+        plt.ylabel(r"$f(x_n^{\star})$")
 
     # plt.axhline(interp(global_minimum + np.sqrt(noise_variance)), color="orange", linestyle="dashed")
     # plt.axhline(interp(global_minimum + 2 * np.sqrt(noise_variance)), color="orange", linestyle="dashed")
+
+    plt.gca().yaxis.set_ticks_position("right")
 
 def plot_error_on_estimated_minimizer(
         palette,
         max_f_evals,
         test_function,
         n_runs,
-        n0_over_dim
+        n0_over_dim,
+        y_label
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
@@ -560,14 +565,20 @@ def plot_error_on_estimated_minimizer(
 
         plt.semilogy()
 
-    plt.ylabel(r"$\left| f(x_n^{\star}) - \mu_n(x_n^{\star}) \right|$")
+    if y_label:
+        plt.ylabel(r"$\left| f(x_n^{\star}) - \mu_n(x_n^{\star}) \right|$")
+
+    plt.xlabel(r"$n$")
+
+    plt.gca().yaxis.set_ticks_position("right")
 
 def plot_noisy_optim(
         palette,
         max_f_evals,
         test_function,
         n_runs,
-        n0_over_dim
+        n0_over_dim,
+        y_label
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
@@ -624,7 +635,10 @@ def plot_noisy_optim(
        [r"${}$".format(y) for y in yticks] + [r"$\eta + \mathrm{min} \, f$", r"$\mathrm{min} \, f$"],
     )
 
-    plt.ylabel(r"$f(x_n) + \epsilon_n$")
+    if y_label:
+        plt.ylabel(r"$f(x_n) + \epsilon_n$")
+
+    plt.gca().yaxis.set_ticks_position("right")
 
 def format_legend(k):
     k = k.replace(" (EI)", "")
