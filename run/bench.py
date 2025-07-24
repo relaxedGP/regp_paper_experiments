@@ -308,7 +308,7 @@ for i in idx_run_list:
                 else:
                     raise ValueError(options["problem"])
 
-                noiseless_problem = getattr(test_problems, noiseless_problem_name)
+                noiseless_problem = getattr(options["test_problems_list"], noiseless_problem_name)
 
                 smc = gpmpcontrib.smc.SMC(problem.input_box)
 
