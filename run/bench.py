@@ -5,7 +5,6 @@ import gpmp as gp
 import gpmpcontrib as gpc
 import sys
 import os
-import gpmpcontrib.optim.test_problems as test_problems
 import gpmpcontrib.smc
 import traceback
 from numpy.random import SeedSequence, default_rng
@@ -134,6 +133,8 @@ def initialize_optimization(env_options):
     else:
         raise ValueError(options["task"])
 
+    options["test_problems_list"] = test_problems
+
     return options, idx_run_list
 
 def get_problem(options, rng):
@@ -141,9 +142,9 @@ def get_problem(options, rng):
     if "noisy_" in options["problem"]:
         noise_variance = float(options["problem"].split("-")[1])
         problem_name = options["problem"].split("-")[0]
-        problem = getattr(test_problems, problem_name)(noise_variance, rng)
+        problem = getattr(options["test_problems_list"], problem_name)(noise_variance, rng)
     else:
-        problem = getattr(test_problems, options["problem"])
+        problem = getattr(options["test_problems_list"], options["problem"])
 
     return problem
 
