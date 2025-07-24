@@ -225,7 +225,7 @@ for i in idx_run_list:
             model_class = gpc.Model_ConstantMeanMaternp_reGP
         else:
             assert len(threshold_strategy_splitted) == 2 and threshold_strategy_splitted[1] == "Noisy", threshold_strategy_splitted
-            model_class = gpc.NoisyModel_ConstantMeanMaternp_reGP
+            model_class = gpc.TwoStageNoisyModel_ConstantMeanMaternp_reGP
 
         model = model_class(
             threshold_strategy_params,

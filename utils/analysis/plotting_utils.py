@@ -405,7 +405,8 @@ def plot_value_of_estimated_minimizer(
         test_function,
         n_runs,
         n0_over_dim,
-        y_label
+        y_label,
+        log_scale
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
@@ -418,11 +419,13 @@ def plot_value_of_estimated_minimizer(
         problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
         global_minimum = 3.0
         noiseless_test_function_name = "goldsteinprice"
+        # yticks = [1000, 10000]
     elif test_function.split("-")[0] == "noisy_goldstein_price_log":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
         global_minimum = np.log(3.0)
         noiseless_test_function_name = "goldstein_price_log"
+        # yticks = [10]
     elif test_function.split("-")[0] == "noisy_beale":
         noise_variance = float(test_function.split("-")[1])
         problem = optim_test_problems.noisy_beale(noise_variance, None)
@@ -446,7 +449,7 @@ def plot_value_of_estimated_minimizer(
     # plt.suptitle(get_test_function_format(test_function))
 
     # First plot
-    interp = lambda x: np.interp(x, np.flip(targets), np.flip(x_array))
+    # interp = lambda x: np.interp(x, np.flip(targets), np.flip(x_array))
 
     for k in value_of_estimated_min.keys():
         lower_q, med, upper_q = value_of_estimated_min[k]
@@ -463,22 +466,28 @@ def plot_value_of_estimated_minimizer(
         best_perf = min(best_perf, lower_q.min())
 
         # Interpolate quantiles
-        lower_q = interp(lower_q)
-        med = interp(med)
-        upper_q = interp(upper_q)
+        # lower_q = interp(lower_q)
+        # med = interp(med)
+        # upper_q = interp(upper_q)
 
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
         plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
         plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
 
-    plt.semilogy()
+    # plt.yticks(
+    #    yticks + [global_minimum + np.sqrt(noise_variance)] + [global_minimum],
+    #    [r"${}$".format(y) for y in yticks] + [r"$\eta + \mathrm{min} \, f$", r"$\mathrm{min} \, f$"],
+    # )
+
+    if log_scale:
+        plt.semilogy()
 
     if y_label:
         plt.ylabel(r"$f(x_n^{\star})$")
 
-    # plt.axhline(interp(global_minimum + np.sqrt(noise_variance)), color="orange", linestyle="dashed")
-    # plt.axhline(interp(global_minimum + 2 * np.sqrt(noise_variance)), color="orange", linestyle="dashed")
+    # plt.axhline(global_minimum + 0 * np.sqrt(noise_variance), color="orange", linestyle="dashed")
+    # plt.axhline(global_minimum + 1 * np.sqrt(noise_variance), color="orange", linestyle="dashed")
 
     plt.gca().yaxis.set_ticks_position("right")
 
@@ -488,7 +497,8 @@ def plot_error_on_estimated_minimizer(
         test_function,
         n_runs,
         n0_over_dim,
-        y_label
+        y_label,
+        log_scale
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
@@ -561,9 +571,10 @@ def plot_error_on_estimated_minimizer(
         plt.plot(abscissa, abs_med, label=format_legend(k.split("-")[0]), linestyle=palette[k][1][1], color=palette[k][1][0])
 
         if show_legend:
-            plt.legend(fontsize=6)
+            plt.legend(fontsize=10)
 
-        plt.semilogy()
+        if log_scale:
+            plt.semilogy()
 
     if y_label:
         plt.ylabel(r"$\left| f(x_n^{\star}) - \mu_n(x_n^{\star}) \right|$")
@@ -578,7 +589,7 @@ def plot_noisy_optim(
         test_function,
         n_runs,
         n0_over_dim,
-        y_label
+        y_label,
     ):
     """
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}

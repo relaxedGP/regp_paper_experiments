@@ -28,9 +28,9 @@ def get_key_value(regp_method, test_function, sequential_strategy):
 
     return key, value
 
-def plot_test_function(test_function, sequential_strategy, args_list, n_runs, y_label):
+def plot_test_function(test_function, sequential_strategy, args_list, n_runs, log_scale, y_label):
     palette = {}
-    for regp_method in ["Constant-Noisy", "Spatial-Noisy", "None-Noisy", "Concentration-Noisy"]:
+    for regp_method in ["Spatial-Noisy", "None-Noisy"]:
         key, value = get_key_value(regp_method, test_function, sequential_strategy)
         palette[key] = value
 
@@ -52,7 +52,8 @@ def plot_test_function(test_function, sequential_strategy, args_list, n_runs, y_
         test_function,
         n_runs,
         10,
-        y_label
+        y_label,
+        log_scale
     )
     plt.tight_layout()
 
@@ -63,14 +64,15 @@ def plot_test_function(test_function, sequential_strategy, args_list, n_runs, y_
         test_function,
         n_runs,
         10,
-        y_label
+        y_label,
+        log_scale
     )
     plt.tight_layout()
 
 test_functions = ["noisy_goldstein_price-10000.0", "noisy_goldstein_price_log-9.0"]
 
 plt.subplots(3, 2, sharex=True, figsize=(6, 6))
-plot_test_function(test_functions[0], sequential_strategy, [[3, 2, 1], [3, 2, 3], [3, 2, 5]], n_runs, y_label=True)
-plot_test_function(test_functions[1], sequential_strategy, [[3, 2, 2], [3, 2, 4], [3, 2, 6]], n_runs, y_label=False)
+plot_test_function(test_functions[0], sequential_strategy, [[3, 2, 1], [3, 2, 3], [3, 2, 5]], n_runs, True, y_label=True)
+plot_test_function(test_functions[1], sequential_strategy, [[3, 2, 2], [3, 2, 4], [3, 2, 6]], n_runs, True, y_label=False)
 plt.tight_layout()
 plt.savefig(os.path.join(output_dir, "multi_noisy.pgf"))
