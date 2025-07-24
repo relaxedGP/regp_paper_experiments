@@ -133,7 +133,7 @@ def initialize_optimization(env_options):
     else:
         raise ValueError(options["task"])
 
-    options["test_problems_list"] = test_problems
+    options["test_problems_lib"] = test_problems
 
     return options, idx_run_list
 
@@ -142,9 +142,9 @@ def get_problem(options, rng):
     if "noisy_" in options["problem"]:
         noise_variance = float(options["problem"].split("-")[1])
         problem_name = options["problem"].split("-")[0]
-        problem = getattr(options["test_problems_list"], problem_name)(noise_variance, rng)
+        problem = getattr(options["test_problems_lib"], problem_name)(noise_variance, rng)
     else:
-        problem = getattr(options["test_problems_list"], options["problem"])
+        problem = getattr(options["test_problems_lib"], options["problem"])
 
     return problem
 
@@ -308,7 +308,7 @@ for i in idx_run_list:
                 else:
                     raise ValueError(options["problem"])
 
-                noiseless_problem = getattr(options["test_problems_list"], noiseless_problem_name)
+                noiseless_problem = getattr(options["test_problems_lib"], noiseless_problem_name)
 
                 smc = gpmpcontrib.smc.SMC(problem.input_box)
 
