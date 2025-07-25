@@ -138,13 +138,12 @@ def initialize_optimization(env_options):
     return options, idx_run_list
 
 def get_problem(options, rng):
-    # FIXME:() Dirty
-    if "noisy_" in options["problem"]:
-        noise_variance = float(options["problem"].split("-")[1])
-        problem_name = options["problem"].split("-")[0]
-        problem = getattr(options["test_problems_lib"], problem_name)(noise_variance, rng)
+    if options["task"] == "optim":
+        problem = options["test_problems_lib"].__getattr__(options["problem"], rng)
+    elif options["task"] == "levelset":
+        problem = options["test_problems_lib"].__getattr__(options["problem"])
     else:
-        problem = getattr(options["test_problems_lib"], options["problem"])
+        raise ValueError(options["task"])
 
     return problem
 
@@ -252,7 +251,7 @@ for i in idx_run_list:
     covparam_list = []
 
     # TODO:() Do better.
-    if "noisy_" in options["problem"]:
+    if "noisy-" in options["problem"]:
         true_value_list = []
         estimated_value_list = []
 
@@ -297,18 +296,8 @@ for i in idx_run_list:
                 sym_diff_vol.append(exp_sym_diff.mean())
 
             # TODO:() Do better.
-            if "noisy_" in options["problem"]:
-                # TODO:() Do better.
-                if options["problem"].split("-")[0] == "noisy_goldstein_price":
-                    noiseless_problem_name = "goldsteinprice"
-                elif options["problem"].split("-")[0] == "noisy_goldstein_price_log":
-                    noiseless_problem_name = "goldstein_price_log"
-                elif options["problem"].split("-")[0] == "noisy_beale":
-                    noiseless_problem_name = "beale"
-                else:
-                    raise ValueError(options["problem"])
-
-                noiseless_problem = getattr(options["test_problems_lib"], noiseless_problem_name)
+            if "noisy-" in options["problem"]:
+                noiseless_problem = problem.noiseless_problem
 
                 smc = gpmpcontrib.smc.SMC(problem.input_box)
 
