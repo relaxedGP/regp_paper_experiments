@@ -55,21 +55,16 @@ def get_test_function_format(x):
         func_name = 'Rosenbrock'
     elif 'ackley' in x:
         func_name = 'Ackley'
-    elif x.split("-")[0] == "noisy_goldstein_price":
-        noise_std = np.sqrt(float(x.split("-")[1]))
+    elif x.split("-")[1] == "goldsteinprice":
+        noise_std = np.sqrt(float(x.split("-")[2]))
         if noise_std.is_integer():
             noise_std = round(noise_std)
         return r"Goldstein-Price ($\eta = {}$)".format(noise_std)
-    elif x.split("-")[0] == "noisy_goldstein_price_log":
-        noise_std = np.sqrt(float(x.split("-")[1]))
+    elif x.split("-")[1] == "goldstein_price_log":
+        noise_std = np.sqrt(float(x.split("-")[2]))
         if noise_std.is_integer():
             noise_std = round(noise_std)
         return r"Log-Goldstein-Price ($\eta = {}$)".format(noise_std)
-    elif x.split("-")[0] == "noisy_beale":
-        noise_std = np.sqrt(float(x.split("-")[1]))
-        if noise_std.is_integer():
-            noise_std = round(noise_std)
-        return r"Noisy Beale ($\eta = {}$)".format(noise_std)
     else:
         raise ValueError(x)
 
@@ -399,6 +394,12 @@ def plot_cummin(
     # ax2.invert_xaxis()
     # ax2.semilogx()
 
+def get_noisy_problem_infos(test_function):
+    problem = optim_test_problems.__getattr__(test_function, np.random.default_rng())
+    noiseless_test_function_name = "-".join(test_function.split("-")[1:(-1)])
+
+    return problem, noiseless_test_function_name
+
 def plot_value_of_estimated_minimizer(
         palette,
         max_f_evals,
@@ -412,27 +413,8 @@ def plot_value_of_estimated_minimizer(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
-    # Get dimension
-    # FIXME:() Dirty
-    if test_function.split("-")[0] == "noisy_goldstein_price":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
-        global_minimum = 3.0
-        noiseless_test_function_name = "goldsteinprice"
-        # yticks = [1000, 10000]
-    elif test_function.split("-")[0] == "noisy_goldstein_price_log":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
-        global_minimum = np.log(3.0)
-        noiseless_test_function_name = "goldstein_price_log"
-        # yticks = [10]
-    elif test_function.split("-")[0] == "noisy_beale":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_beale(noise_variance, None)
-        global_minimum = 0.0
-        noiseless_test_function_name = "beale"
-    else:
-        problem = getattr(optim_test_problems, test_function)
+    # Get problem
+    problem, noiseless_test_function_name = get_noisy_problem_infos(test_function)
 
     # Get spatial quantiles
     x_array, targets = get_spatial_quantiles_targets(noiseless_test_function_name)
@@ -504,28 +486,15 @@ def plot_error_on_estimated_minimizer(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
-    # Get dimension
-    # FIXME:() Dirty
-    if test_function.split("-")[0] == "noisy_goldstein_price":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
-        # global_minimum = 3.0
-        # noiseless_test_function_name = "goldsteinprice"
+    # Get problem
+    problem, noiseless_test_function_name = get_noisy_problem_infos(test_function)
+
+    if test_function.split("-")[1] == "goldsteinprice":
         show_legend = True
-    elif test_function.split("-")[0] == "noisy_goldstein_price_log":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
-        # global_minimum = np.log(3.0)
-        # noiseless_test_function_name = "goldstein_price_log"
-        show_legend = False
-    elif test_function.split("-")[0] == "noisy_beale":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_beale(noise_variance, None)
-        # global_minimum = 0
-        # noiseless_test_function_name = "beale"
+    elif test_function.split("-")[1] == "goldstein_price_log":
         show_legend = False
     else:
-        problem = getattr(optim_test_problems, test_function)
+        raise ValueError(test_function)
 
     # Get spatial quantiles
     # x_array, targets = get_spatial_quantiles_targets(noiseless_test_function_name)
@@ -595,26 +564,21 @@ def plot_noisy_optim(
     palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
     """
 
-    # Get dimension
-    # FIXME:() Dirty
-    if test_function.split("-")[0] == "noisy_goldstein_price":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price(noise_variance, None)
+    # Get problem
+    problem, noiseless_test_function_name = get_noisy_problem_infos(test_function)
+
+    if test_function.split("-")[1] == "goldsteinprice":
         yticks = [300, 500]
         global_minimum = 3.0
         upper_threshold = 600
-    elif test_function.split("-")[0] == "noisy_goldstein_price_log":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_goldstein_price_log(noise_variance, None)
+    elif test_function.split("-")[1] == "goldstein_price_log":
         global_minimum = np.log(3.0)
         yticks = [10, 15]
         upper_threshold = None
-    elif test_function.split("-")[0] == "noisy_beale":
-        noise_variance = float(test_function.split("-")[1])
-        problem = optim_test_problems.noisy_beale(noise_variance, None)
-        global_minimum = 0.0
     else:
-        problem = getattr(optim_test_problems, test_function)
+        raise ValueError(test_function)
+
+    noise_variance = float(test_function.split("-")[-1])
 
     dim = problem.input_dim
 

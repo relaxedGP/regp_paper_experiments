@@ -69,7 +69,7 @@ def plot_test_function(test_function, sequential_strategy, args_list, n_runs, lo
     )
     plt.tight_layout()
 
-test_functions = ["noisy_goldstein_price-10000.0", "noisy_goldstein_price_log-9.0"]
+test_functions = ["noisy-goldsteinprice-10000.0", "noisy-goldstein_price_log-9.0"]
 
 plt.subplots(3, 2, sharex=True, figsize=(6, 6))
 plot_test_function(test_functions[0], sequential_strategy, [[3, 2, 1], [3, 2, 3], [3, 2, 5]], n_runs, True, y_label=True)
