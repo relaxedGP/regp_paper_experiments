@@ -110,6 +110,11 @@ bash run_allmethods.sh goldsteinprice 100 EI
 ```
 Note that these bash scripts use the `python3` command.
 
+The script `run_allnoisymethods.sh` can be used to launch "None-Noisy" and "Spatial-Noisy" in parallel:
+```
+bash run_allnoisymethods.sh noisy-goldsteinprice-10000.0 100 UCB10
+```
+
 ### Plotting the results
 
 The `.pgf` figures showing the results of the benchmarks can be reproduced using the scripts in `utils/analysis`.
