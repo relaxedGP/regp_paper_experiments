@@ -455,7 +455,7 @@ def plot_value_of_estimated_minimizer(
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
         plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
-        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0], linewidth=0.6)
 
     # plt.yticks(
     #    yticks + [global_minimum + np.sqrt(noise_variance)] + [global_minimum],
@@ -537,7 +537,7 @@ def plot_error_on_estimated_minimizer(
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
         plt.fill_between(abscissa, abs_lower_q, abs_upper_q, color=palette[k][1][0], alpha=0.2)
-        plt.plot(abscissa, abs_med, label=format_legend(k.split("-")[0]), linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.plot(abscissa, abs_med, label=format_legend(k.split("-")[0]), linestyle=palette[k][1][1], color=palette[k][1][0], linewidth=0.6)
 
         if show_legend:
             plt.legend(fontsize=10)
@@ -597,7 +597,7 @@ def plot_noisy_optim(
         # Plot
         abscissa = list(range(n0_over_dim * dim, max_f_evals))
         plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
-        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0])
+        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0], linewidth=0.6)
 
         if upper_threshold is not None:
             plt.ylim(lower_q.min(), upper_threshold)
