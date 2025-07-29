@@ -54,7 +54,7 @@ The folder `results` must be created for storage.
 The EGO algorithm and the three EGO-R variants introduced in the article can be run using the script `run/bench.py`.
 To run one repetition of the *concentration* heuristic on the *Goldstein-Price* function, one can use
 ```
-PYTHONPATH=utils SMC_METHOD=restart problem=goldsteinprice ALGO=EI STRATEGY=Concentration python3 -u run/bench.py
+PYTHONPATH=utils SMC_METHOD=restart PROBLEM=goldsteinprice ALGO=EI STRATEGY=Concentration python3 -u run/bench.py
 ```
 The two other reGP variants are run by setting `STRATEGY=Constant` and `STRATEGY=Spatial`.
 The traditional EGO algorithm is run by setting `STRATEGY=None`.
@@ -74,12 +74,26 @@ Other quantile levels can be used. For instance, the argument `ALGO=UCB1` stands
 
 The straddle benchmark can be reproduced similarly. For the `c6` test function, run
 ```
-PYTHONPATH=utils problem=c6 ALGO=straddle STRATEGY=Concentration SMC_METHOD=subset python3 -u run/bench.py
+PYTHONPATH=utils PROBLEM=c6 ALGO=straddle STRATEGY=Concentration SMC_METHOD=subset python3 -u run/bench.py
 ```
 Use the same command for the `c67` test function.
-The argument `problem=goldsteinprice-1000` can be used to run the straddle heuristic on the Goldstein-Price function with the threshold $`s = 1000`$.
-The corresponding argument is `problem=goldstein_price_log-6.90775` for the log version.
+The argument `PROBLEM=goldsteinprice-1000` can be used to run the straddle heuristic on the Goldstein-Price function with the threshold $`s = 1000`$.
+The corresponding argument is `PROBLEM=goldstein_price_log-6.90775` for the log version.
 The straddle heuristic can be run with other threshold values for the Goldstein-Price function and its log version.
+
+#### Noisy optimization experiments
+
+Noisy optimization experiments can also be run. Noisy models are selected by setting `STRATEGY=None-Noisy` (GPs) or
+`STRATEGY=Spatial-Noisy` (two-stage reGP algorithm tested in the article). Simulated Gaussian noise is added to the test
+functions. For instance, adding Gaussian noise with variance~$10^4$ to the Goldstein-Price function is made
+by setting `PROBLEM=noisy-goldsteinprice-10000.0`. Running the experiments from the article is made by using
+```
+PYTHONPATH=utils PROBLEM=noisy-goldsteinprice-10000.0 ALGO=UCB10 STRATEGY=Spatial-Noisy SMC_METHOD=subset python3 -u run/bench.py
+```
+and
+```
+PYTHONPATH=utils PROBLEM=noisy-goldstein_price_log-9.0 ALGO=UCB10 STRATEGY=Spatial-Noisy SMC_METHOD=subset python3 -u run/bench.py
+```
 
 ##### Launching multiple repetitions using SLURM
 
