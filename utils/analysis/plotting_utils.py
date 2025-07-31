@@ -17,9 +17,9 @@ def get_func_param(x):
 def get_test_function_format(x):
 
     if x == "c6":
-        return x
+        return r"$c_6$"
     elif x == "c67":
-        return x
+        return r"$c_6^7$"
     elif x == "goldsteinprice-1000":
         return 'Goldstein-Price'
     elif x == "goldstein_price_log-6.90775":
@@ -55,6 +55,16 @@ def get_test_function_format(x):
         func_name = 'Rosenbrock'
     elif 'ackley' in x:
         func_name = 'Ackley'
+    elif x.split("-")[1] == "goldsteinprice":
+        noise_std = np.sqrt(float(x.split("-")[2]))
+        if noise_std.is_integer():
+            noise_std = round(noise_std)
+        return r"Goldstein-Price ($\eta = {}$)".format(noise_std)
+    elif x.split("-")[1] == "goldstein_price_log":
+        noise_std = np.sqrt(float(x.split("-")[2]))
+        if noise_std.is_integer():
+            noise_std = round(noise_std)
+        return r"Log-Goldstein-Price ($\eta = {}$)".format(noise_std)
     else:
         raise ValueError(x)
 
@@ -125,6 +135,21 @@ def fetch_data(data_dir, n_runs):
 
     return L
 
+def fetch_value_estimated_min_propeties(data_dir, n_runs):
+    L_truth = []
+    L_estimated = []
+    for i in range(n_runs):
+        sub_path_truth = os.path.join(data_dir, 'truevalue_{}.npy'.format(i))
+        sub_path_estimated = os.path.join(data_dir, 'estimatedvalue_{}.npy'.format(i))
+
+        data_truth = np.load(sub_path_truth).ravel()
+        data_estimated = np.load(sub_path_estimated).ravel()
+
+        L_truth.append(data_truth)
+        L_estimated.append(data_estimated)
+
+    return L_truth, L_estimated
+
 def get_cummins(data_dir, n_runs, max_f_evals):
     runs_data = fetch_data(data_dir, n_runs)
 
@@ -147,6 +172,51 @@ def get_cummins(data_dir, n_runs, max_f_evals):
 def get_cummin_statistics(data_dir, n_runs, max_f_evals):
     cummins = get_cummins(data_dir, n_runs, max_f_evals)
     return np.quantile(cummins, 0.1, axis=0), np.quantile(cummins, 0.5, axis=0), np.quantile(cummins, 0.9, axis=0)
+
+def get_value_of_estimated_min_statistics(data_dir, n_runs, max_f_evals):
+    truth_data, _ = fetch_value_estimated_min_propeties(data_dir, n_runs)
+    truth_data = np.array(truth_data)
+    return np.quantile(truth_data, 0.1, axis=0), np.quantile(truth_data, 0.5, axis=0), np.quantile(truth_data, 0.9, axis=0)
+
+def get_error_estimated_min_statistics(data_dir, n_runs, max_f_evals):
+    truth_data, estimated_data = fetch_value_estimated_min_propeties(data_dir, n_runs)
+    truth_data = np.array(truth_data)
+    estimated_data = np.array(estimated_data)
+    diff_data = truth_data - estimated_data
+    return np.quantile(np.abs(diff_data), 0.1, axis=0), np.quantile(np.abs(diff_data), 0.5, axis=0), np.quantile(np.abs(diff_data), 0.9, axis=0)
+
+def get_optim_statistics(data_dir, n_runs, max_f_evals):
+    values = fetch_data(data_dir, n_runs)
+
+    assert all([_values.shape == values[0].shape for _values in values]), [_values.shape for _values in values]
+    # for i in range(len(values)):
+    #     _values = values[i]
+    #     if len(_values) < max_f_evals:
+    #         inf_padding = (max_f_evals - _values.shape[0]) * [np.inf]
+    #         inf_padding = np.array(inf_padding)
+    #
+    #         _values = np.concatenate((_values, inf_padding))
+    #         values[i] = _values
+
+    values = np.array(values)
+
+    # # Expose?
+    # n_bootstrap = 100
+    #
+    # lower_q = np.zeros([values.shape[1]])
+    # median = np.zeros([values.shape[1]])
+    # upper_q = np.zeros([values.shape[1]])
+    #
+    # for i in range(values.shape[1]):
+    #     _medians = []
+    #     for j in range(n_bootstrap):
+    #         samples = np.random.choice(values[:, i], size=values[:, i].shape[0], replace=True)
+    #         _medians.append(np.quantile(samples, 0.5))
+    #     lower_q[i] = np.quantile(_medians, 0.1)
+    #     median[i] = np.quantile(_medians, 0.5)
+    #     upper_q[i] = np.quantile(_medians, 0.9)
+
+    return np.quantile(values, 0.1, axis=0), np.quantile(values, 0.5, axis=0), np.quantile(values, 0.9, axis=0)
 
 def get_format_data(data_dir, targets, max_f_evals, n_runs):
     runs_data = fetch_data(data_dir, n_runs)
@@ -324,19 +394,240 @@ def plot_cummin(
     # ax2.invert_xaxis()
     # ax2.semilogx()
 
+def get_noisy_problem_infos(test_function):
+    problem = optim_test_problems.__getattr__(test_function, np.random.default_rng())
+    noiseless_test_function_name = "-".join(test_function.split("-")[1:(-1)])
+
+    return problem, noiseless_test_function_name
+
+def plot_value_of_estimated_minimizer(
+        palette,
+        max_f_evals,
+        test_function,
+        n_runs,
+        n0_over_dim,
+        y_label,
+        log_scale
+    ):
+    """
+    palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
+    """
+
+    # Get problem
+    problem, noiseless_test_function_name = get_noisy_problem_infos(test_function)
+
+    # Get spatial quantiles
+    x_array, targets = get_spatial_quantiles_targets(noiseless_test_function_name)
+
+    value_of_estimated_min = {k: get_value_of_estimated_min_statistics(palette[k][0], n_runs, max_f_evals)
+                              for k in palette.keys()}
+
+    dim = problem.input_dim
+
+    # level = 0.66
+
+    best_perf = np.inf
+
+    # plt.suptitle(get_test_function_format(test_function))
+
+    # First plot
+    # interp = lambda x: np.interp(x, np.flip(targets), np.flip(x_array))
+
+    for k in value_of_estimated_min.keys():
+        lower_q, med, upper_q = value_of_estimated_min[k]
+
+        # # Filter out initial DoE
+        # lower_q = lower_q[n0_over_dim * dim:]
+        # med = med[n0_over_dim * dim:]
+        # upper_q = upper_q[n0_over_dim * dim:]
+
+        #
+        assert lower_q.min() > min(targets)
+
+        # Fetch best perf
+        best_perf = min(best_perf, lower_q.min())
+
+        # Interpolate quantiles
+        # lower_q = interp(lower_q)
+        # med = interp(med)
+        # upper_q = interp(upper_q)
+
+        # Plot
+        abscissa = list(range(n0_over_dim * dim, max_f_evals))
+        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0], linewidth=0.6)
+
+    # plt.yticks(
+    #    yticks + [global_minimum + np.sqrt(noise_variance)] + [global_minimum],
+    #    [r"${}$".format(y) for y in yticks] + [r"$\eta + \mathrm{min} \, f$", r"$\mathrm{min} \, f$"],
+    # )
+
+    if log_scale:
+        plt.semilogy()
+
+    if y_label:
+        plt.ylabel(r"$f(x_n^{\star})$")
+
+    # plt.axhline(global_minimum + 0 * np.sqrt(noise_variance), color="orange", linestyle="dashed")
+    # plt.axhline(global_minimum + 1 * np.sqrt(noise_variance), color="orange", linestyle="dashed")
+
+    plt.gca().yaxis.set_ticks_position("right")
+
+def plot_error_on_estimated_minimizer(
+        palette,
+        max_f_evals,
+        test_function,
+        n_runs,
+        n0_over_dim,
+        y_label,
+        log_scale
+    ):
+    """
+    palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
+    """
+
+    # Get problem
+    problem, noiseless_test_function_name = get_noisy_problem_infos(test_function)
+
+    if test_function.split("-")[1] == "goldsteinprice":
+        show_legend = True
+    elif test_function.split("-")[1] == "goldstein_price_log":
+        show_legend = False
+    else:
+        raise ValueError(test_function)
+
+    # Get spatial quantiles
+    # x_array, targets = get_spatial_quantiles_targets(noiseless_test_function_name)
+
+    error_on_estimated_min = {k: get_error_estimated_min_statistics(palette[k][0], n_runs, max_f_evals)
+                              for k in palette.keys()}
+
+    dim = problem.input_dim
+
+    # # level = 0.66
+    #
+    # best_perf = np.inf
+
+    # plt.suptitle(get_test_function_format(test_function))
+
+    ## First plot
+    # interp = lambda x: np.interp(x, np.flip(targets), np.flip(x_array))
+
+    for k in error_on_estimated_min.keys():
+        abs_lower_q = error_on_estimated_min[k][0]
+        abs_med = error_on_estimated_min[k][1]
+        abs_upper_q = error_on_estimated_min[k][2]
+
+        # # Filter out initial DoE
+        # lower_q = lower_q[n0_over_dim * dim:]
+        # med = med[n0_over_dim * dim:]
+        # upper_q = upper_q[n0_over_dim * dim:]
+
+        #
+        # assert lower_q.min() > min(targets)
+
+        # Fetch best perf
+        # best_perf = min(best_perf, lower_q.min())
+
+        # # Interpolate quantiles
+        # lower_q = interp(lower_q)
+        # med = interp(med)
+        # upper_q = interp(upper_q)
+
+        # Plot
+        abscissa = list(range(n0_over_dim * dim, max_f_evals))
+        plt.fill_between(abscissa, abs_lower_q, abs_upper_q, color=palette[k][1][0], alpha=0.2)
+        plt.plot(abscissa, abs_med, label=format_legend(k.split("-")[0]), linestyle=palette[k][1][1], color=palette[k][1][0], linewidth=0.6)
+
+        if show_legend:
+            plt.legend(fontsize=10)
+
+        if log_scale:
+            plt.semilogy()
+
+    if y_label:
+        plt.ylabel(r"$\left| f(x_n^{\star}) - \mu_n(x_n^{\star}) \right|$")
+
+    plt.xlabel(r"$n$")
+
+    plt.gca().yaxis.set_ticks_position("right")
+
+def plot_noisy_optim(
+        palette,
+        max_f_evals,
+        test_function,
+        n_runs,
+        n0_over_dim,
+        y_label,
+    ):
+    """
+    palette is a dict like: {"Concentration": [path, ("green", "solid")], ...}
+    """
+
+    # Get problem
+    problem, noiseless_test_function_name = get_noisy_problem_infos(test_function)
+
+    if test_function.split("-")[1] == "goldsteinprice":
+        yticks = [300, 500]
+        global_minimum = 3.0
+        upper_threshold = 600
+    elif test_function.split("-")[1] == "goldstein_price_log":
+        global_minimum = np.log(3.0)
+        yticks = [10, 15]
+        upper_threshold = None
+    else:
+        raise ValueError(test_function)
+
+    noise_variance = float(test_function.split("-")[-1])
+
+    dim = problem.input_dim
+
+    statistics = {k: get_optim_statistics(palette[k][0], n_runs, max_f_evals) for k in palette.keys()}
+
+    plt.title(get_test_function_format(test_function))
+
+    for k in statistics.keys():
+        lower_q, med, upper_q = statistics[k]
+
+        # Filter out initial DoE
+        lower_q = lower_q[n0_over_dim * dim:]
+        med = med[n0_over_dim * dim:]
+        upper_q = upper_q[n0_over_dim * dim:]
+
+        # Plot
+        abscissa = list(range(n0_over_dim * dim, max_f_evals))
+        plt.fill_between(abscissa, lower_q, upper_q, color=palette[k][1][0], alpha=0.2)
+        plt.plot(abscissa, med, label=k, linestyle=palette[k][1][1], color=palette[k][1][0], linewidth=0.6)
+
+        if upper_threshold is not None:
+            plt.ylim(lower_q.min(), upper_threshold)
+
+    plt.axhline(global_minimum + np.sqrt(noise_variance), color="orange", linestyle="dashed")
+    plt.axhline(global_minimum + 0, color="orange", linestyle="dashed")
+
+    plt.yticks(
+       yticks + [global_minimum + np.sqrt(noise_variance)] + [global_minimum],
+       [r"${}$".format(y) for y in yticks] + [r"$\eta + \mathrm{min} \, f$", r"$\mathrm{min} \, f$"],
+    )
+
+    if y_label:
+        plt.ylabel(r"$f(x_n) + \epsilon_n$")
+
+    plt.gca().yaxis.set_ticks_position("right")
+
 def format_legend(k):
     k = k.replace(" (EI)", "")
     k = k.replace(" (UCB10)", "")
     k = k.replace(" (straddle)", "")
 
     if k == "Constant":
-        return "Const."
+        return "const."
     elif k == "Concentration":
-        return "Concent."
+        return "concent."
     elif k == "None":
-        return "None"
+        return "GP"
     elif k == "Spatial":
-        return "Spatial"
+        return "spatial"
     else:
         raise RuntimeError(k)
 
