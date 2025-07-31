@@ -1,0 +1,14 @@
+set -e
+
+# export MODULE_LOAD=anaconda3/2022.10/gcc-11.2.0
+
+CASE=$1
+REP=$2
+SEQUENTIAL_STRATEGY=$3
+RUN_EGO="bash run_method.sh"
+RESULTS="results"
+
+for METHOD in None-Noisy Spatial-Noisy
+do
+  $RUN_EGO $RESULTS $CASE $METHOD $REP $SEQUENTIAL_STRATEGY
+done

@@ -5,12 +5,13 @@ import gpmp as gp
 import gpmpcontrib as gpc
 import sys
 import os
-import gpmpcontrib.optim.test_problems as test_problems
 import gpmpcontrib.smc
 import traceback
 from numpy.random import SeedSequence, default_rng
 from does.designs import maximinlhs, sobol
 import scipy.stats
+import gpmp.num as gnp
+import gpmpcontrib.samplingcriteria as sampcrit
 
 assert gp.num._gpmp_backend_ == "torch", "{} is used, please install Torch.".format(gp.num._gpmp_backend_)
 
@@ -132,9 +133,19 @@ def initialize_optimization(env_options):
     else:
         raise ValueError(options["task"])
 
-    problem = getattr(test_problems, options["problem"])
+    options["test_problems_lib"] = test_problems
 
-    return problem, options, idx_run_list
+    return options, idx_run_list
+
+def get_problem(options, rng):
+    if options["task"] == "optim":
+        problem = options["test_problems_lib"].__getattr__(options["problem"], rng)
+    elif options["task"] == "levelset":
+        problem = options["test_problems_lib"].__getattr__(options["problem"])
+    else:
+        raise ValueError(options["task"])
+
+    return problem
 
 def get_algo(problem, model, options):
     algo_name = options["algo"]
@@ -170,19 +181,29 @@ def get_levelset_threshold(problem):
     return bounds[0][1]
 
 # --------------------------------------------------------------------------------------
-problem, options, idx_run_list = initialize_optimization(env_options)
+options, idx_run_list = initialize_optimization(env_options)
 
 
 # Repetition Loop
 for i in idx_run_list:
     rng = get_rng(i, n_runs_max)
+
+    problem = get_problem(options, rng)
+
     options["algo_options"]["smc_options"]["rng"] = rng
 
     ni0 = options["n0_over_d"] * problem.input_dim
     xi = maximinlhs(problem.input_dim, ni0, problem.input_box, rng)
 
-    if options["threshold_strategy"] == "None":
-        model = gpc.Model_ConstantMeanMaternpML(
+    if "None" in options["threshold_strategy"]:
+        if options["threshold_strategy"] == "None":
+            model_class = gpc.Model_ConstantMeanMaternpML
+        elif options["threshold_strategy"] == "None-Noisy":
+            model_class = gpc.NoisyModel_ConstantMeanMaternpML
+        else:
+            raise ValueError(options["threshold_strategy"])
+
+        model = model_class(
             "GP_bench_{}".format(options["problem"]),
             output_dim=problem.output_dim,
             covariance_params={"p": 2},
@@ -190,15 +211,23 @@ for i in idx_run_list:
             box=problem.input_box
         )
     else:
+        threshold_strategy_splitted = options["threshold_strategy"].split("-")
         threshold_strategy_params = {
-            "strategy": options["threshold_strategy"] ,
-            "level": options["q_strategy_value"] ,
+            "strategy": threshold_strategy_splitted[0],
+            "level": options["q_strategy_value"],
             "n_init": ni0,
             "task": options["task"]
         }
         if options["task"] == "levelset":
             threshold_strategy_params["t"] = get_levelset_threshold(problem)
-        model = gpc.Model_ConstantMeanMaternp_reGP(
+
+        if len(threshold_strategy_splitted) == 1:
+            model_class = gpc.Model_ConstantMeanMaternp_reGP
+        else:
+            assert len(threshold_strategy_splitted) == 2 and threshold_strategy_splitted[1] == "Noisy", threshold_strategy_splitted
+            model_class = gpc.TwoStageNoisyModel_ConstantMeanMaternp_reGP
+
+        model = model_class(
             threshold_strategy_params,
             "reGP_bench_{}".format(options["problem"]),
             crit_optim_options=options["crit_optim_options"],
@@ -220,6 +249,11 @@ for i in idx_run_list:
 
     meanparam_list = []
     covparam_list = []
+
+    # TODO:() Do better.
+    if "noisy-" in options["problem"]:
+        true_value_list = []
+        estimated_value_list = []
 
     if options["task"] == "levelset":
         m = 17
@@ -260,6 +294,85 @@ for i in idx_run_list:
 
                 exp_sym_diff = key_truth * (1 - gaussian_cdf) + (1 - key_truth) * gaussian_cdf
                 sym_diff_vol.append(exp_sym_diff.mean())
+
+            # TODO:() Do better.
+            if "noisy-" in options["problem"]:
+                noiseless_problem = problem.noiseless_problem
+
+                smc = gpmpcontrib.smc.SMC(problem.input_box)
+
+                def boxify_criterion(x):
+                   input_box = gnp.asarray(problem.input_box)
+                   b = sampcrit.isinbox(input_box, x)
+
+                   res, _ = algo.predict(x, convert_out=False)
+
+                   res = - res.flatten()
+
+                   res = gnp.where(gnp.asarray(b), res, - gnp.inf)
+
+                   return res
+
+                smc.subset(
+                   func=boxify_criterion,
+                   target=np.inf,
+                   p0=0.2,
+                   xi=algo.xi,
+                   debug=False
+                )
+
+                zpm, _ = algo.predict(smc.particles.x, convert_out=False)
+
+                assert not gnp.isnan(zpm).any()
+
+                x_new = smc.particles.x[gnp.argmin(gnp.asarray(zpm))].reshape(1, -1)
+
+                # print(x_new)
+                # print(algo.predict(x_new)[0])
+                # print(problem.eval(x_new))
+
+                #
+                init = gnp.to_np(x_new).ravel()
+
+                def crit_(x):
+                   x_row = x.reshape(1, -1)
+                   zpm, _ = algo.predict(x_row, convert_out=False)
+                   return zpm[0, 0]
+
+                crit_jit = gnp.jax.jit(crit_)
+
+                dcrit = gnp.jax.jit(gnp.grad(crit_jit))
+
+                box = problem.input_box
+                assert all([len(_v) == len(box[0]) for _v in box])
+
+                bounds = [tuple(box[_i][k] for _i in range(len(box))) for k in range(len(box[0]))]
+                model_argmin = gp.kernel.autoselect_parameters(
+                   init, crit_jit, dcrit, bounds=bounds
+                )
+
+                if gnp.numpy.isnan(model_argmin).any():
+                   minimizer = init
+
+                for _i in range(model_argmin.shape[0]):
+                   if model_argmin[_i] < bounds[_i][0]:
+                       model_argmin[_i] = bounds[_i][0]
+                   if bounds[_i][1] < model_argmin[_i]:
+                       model_argmin[_i] = bounds[_i][1]
+
+                if crit_(model_argmin) < crit_(init):
+                   minimizer = model_argmin
+                else:
+                   minimizer = init
+
+                minimizer = gnp.asarray(minimizer.reshape(1, -1))
+
+                # print(minimizer)
+                # print(algo.predict(minimizer)[0])
+                # print(problem.eval(minimizer))
+
+                true_value_list.append(noiseless_problem.eval(minimizer))
+                estimated_value_list.append(algo.predict(minimizer)[0][0, 0])
 
         except gp.num.GnpLinalgError as e:
             i_error_path = os.path.join(options["output_dir"], str(i))
@@ -320,6 +433,18 @@ for i in idx_run_list:
             if os.path.exists(sym_diff_vol_path):
                 os.remove(sym_diff_vol_path)
             np.save(sym_diff_vol_path, np.array(sym_diff_vol))
+
+        # TODO:() Do better.
+        if "Noisy" in options["threshold_strategy"]:
+            true_value_path = os.path.join(options["output_dir"], "truevalue_{}.npy".format(str(i)))
+            if os.path.exists(true_value_path):
+                os.remove(true_value_path)
+            np.save(true_value_path, np.array(true_value_list))
+
+            estimated_value_path = os.path.join(options["output_dir"], "estimatedvalue_{}.npy".format(str(i)))
+            if os.path.exists(estimated_value_path):
+                os.remove(estimated_value_path)
+            np.save(estimated_value_path, np.array(estimated_value_list))
 
     # endfor
 

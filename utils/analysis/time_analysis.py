@@ -85,7 +85,10 @@ for k in ["Concentration", "Constant", "Spatial"]:
     lower_q, med, upper_q = regp_methods_relative_times[k]
 
     plt.fill_between(abscissa, lower_q, upper_q, color=regp_methods_palette[k], alpha=0.2)
-    plt.plot(abscissa, med, label=k, linestyle="solid", color=regp_methods_palette[k])
+    plt.plot(abscissa, med, label=plotting_utils.format_legend(k), linestyle="solid", color=regp_methods_palette[k])
+
+    if test_function == "perm10":
+        plt.legend()
 
 #plt.legend()
 plt.ylim([1, 1000])
