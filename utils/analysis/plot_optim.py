@@ -8,14 +8,14 @@ if len(sys.argv) == 5:
     test_function = sys.argv[4]
 else:
     test_function = None
-    import matplotlib
-    matplotlib.use("pgf")
-    matplotlib.rcParams.update({
-        "pgf.texsystem": "pdflatex",
-        'font.family': 'serif',
-        'text.usetex': True,
-        'pgf.rcfonts': False,
-    })
+    # import matplotlib
+    # matplotlib.use("pgf")
+    # matplotlib.rcParams.update({
+    #     "pgf.texsystem": "pdflatex",
+    #     'font.family': 'serif',
+    #     'text.usetex': True,
+    #     'pgf.rcfonts': False,
+    # })
 
 import matplotlib.pyplot as plt
 
@@ -90,5 +90,5 @@ for test_function in test_functions:
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function)))
+        plt.savefig(os.path.join(output_dir, "{}.pdf".format(test_function)))
         plt.close()
