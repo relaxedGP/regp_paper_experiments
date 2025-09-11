@@ -90,5 +90,5 @@ for test_function in test_functions:
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(output_dir, "{}.pgf".format(test_function)))
+        plt.savefig(os.path.join(output_dir, "{}.pdf".format(test_function)))
         plt.close()
