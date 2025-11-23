@@ -142,4 +142,4 @@ python3 -u plot_noisy_optim.py UCB10 ../../results figures_path 100
 
 regp_paper_experiments is released under the [BSD-3-Clause](COPYING.md) license.
 
-_Copyright (c) 2024, LNE & CentraleSupélec_
+_Copyright (c) 2025, LNE & CentraleSupélec_
