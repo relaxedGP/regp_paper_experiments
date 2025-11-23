@@ -85,7 +85,7 @@ The straddle heuristic can be run with other threshold values for the Goldstein-
 
 Noisy optimization experiments can also be run. Noisy models are selected by setting `STRATEGY=None-Noisy` (GPs) or
 `STRATEGY=Spatial-Noisy` (two-stage reGP algorithm tested in the article). Simulated Gaussian noise is added to the test
-functions. For instance, adding Gaussian noise with variance~$10^4$ to the Goldstein-Price function is made
+functions. For instance, adding Gaussian noise with variance $`10^4`$ to the Goldstein-Price function is made
 by setting `PROBLEM=noisy-goldsteinprice-10000.0`. Running the experiments from the article is made by using
 ```
 PYTHONPATH=utils PROBLEM=noisy-goldsteinprice-10000.0 ALGO=UCB10 STRATEGY=Spatial-Noisy SMC_METHOD=subset python3 -u run/bench.py
