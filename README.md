@@ -117,9 +117,9 @@ bash run_allnoisymethods.sh noisy-goldsteinprice-10000.0 100 UCB10
 
 ### Plotting the results
 
-The `.pgf` figures showing the results of the benchmarks can be reproduced using the scripts in `utils/analysis`.
+The `.pdf` figures showing the results of the benchmarks can be reproduced using the scripts in `utils/analysis`.
 Assume the results are stored in the `results` folder at the root of the repos and
-`figures_path` is the folder where the `.pgf` files should be stored.
+`figures_path` is the folder where the `.pdf` files should be stored.
 For EI and UCB, one can use
 ```
 cd utils/analysis
@@ -132,6 +132,11 @@ python3 -u plot_levelset.py c6 ../../results figures_path
 ```
 Run the same command for the other test functions.
 
+For the noisy optimization benchmark, one can run
+```
+cd utils/analysis
+python3 -u plot_noisy_optim.py UCB10 ../../results figures_path 100
+```
 
 ## License
 
