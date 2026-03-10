@@ -227,6 +227,8 @@ for i in idx_run_list:
             assert threshold_strategy_splitted[1] == "Noisy", threshold_strategy_splitted
             if threshold_strategy_splitted[2] == "HardThresholded":
                 model_class = gpc.TwoStageNoisyModel_ConstantMeanMaternp_HardThresholded
+            elif threshold_strategy_splitted[2] == "HardThresholdedFixedParams":
+                model_class = gpc.TwoStageNoisyModel_ConstantMeanMaternp_HardThresholded_FixedParams
             else:
                 raise ValueError(threshold_strategy_splitted)
         else:
