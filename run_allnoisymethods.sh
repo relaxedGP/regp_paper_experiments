@@ -8,7 +8,7 @@ SEQUENTIAL_STRATEGY=$3
 RUN_EGO="bash run_method.sh"
 RESULTS="results"
 
-for METHOD in None-Noisy Spatial-Noisy Spatial-Noisy-HardThresholded Spatial-Noisy-HardThresholded_FixedParams
+for METHOD in None-Noisy Spatial-Noisy Spatial-Noisy-HardThresholded Spatial-Noisy-HardThresholdedFixedParams
 do
   $RUN_EGO $RESULTS $CASE $METHOD $REP $SEQUENTIAL_STRATEGY
 done
