@@ -223,6 +223,14 @@ for i in idx_run_list:
 
         if len(threshold_strategy_splitted) == 1:
             model_class = gpc.Model_ConstantMeanMaternp_reGP
+        elif len(threshold_strategy_splitted) == 3:
+            assert threshold_strategy_splitted[1] == "Noisy", threshold_strategy_splitted
+            if threshold_strategy_splitted[2] == "HardThresholded":
+                model_class = gpc.TwoStageNoisyModel_ConstantMeanMaternp_HardThresholded
+            elif threshold_strategy_splitted[2] == "HardThresholdedFixedParams":
+                model_class = gpc.TwoStageNoisyModel_ConstantMeanMaternp_HardThresholded_FixedParams
+            else:
+                raise ValueError(threshold_strategy_splitted)
         else:
             assert len(threshold_strategy_splitted) == 2 and threshold_strategy_splitted[1] == "Noisy", threshold_strategy_splitted
             model_class = gpc.TwoStageNoisyModel_ConstantMeanMaternp_reGP
