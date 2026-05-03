@@ -443,7 +443,7 @@ for i in idx_run_list:
             np.save(sym_diff_vol_path, np.array(sym_diff_vol))
 
         # TODO:() Do better.
-        if "Noisy" in options["threshold_strategy"]:
+        if "noisy-" in options["problem"]:
             true_value_path = os.path.join(options["output_dir"], "truevalue_{}.npy".format(str(i)))
             if os.path.exists(true_value_path):
                 os.remove(true_value_path)
